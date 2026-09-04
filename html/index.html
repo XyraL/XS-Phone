@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cipher-phone</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/shell.css">
+    <link rel="stylesheet" href="css/apps.css">
+    <link rel="stylesheet" href="css/apps-comms.css">
+    <link rel="stylesheet" href="css/apps-suite.css">
+    <link rel="stylesheet" href="css/apps-social.css">
+    <link rel="stylesheet" href="css/apps-extra.css">
+    <link rel="stylesheet" href="css/apps-platform.css">
+</head>
+<body>
+    <div id="phone-root" class="hidden">
+        <div id="phone-frame">
+            <div class="side-btn btn-power"></div>
+            <div class="side-btn btn-vol-up"></div>
+            <div class="side-btn btn-vol-down"></div>
+
+            <div id="phone-screen" class="wp-aurora theme-dark">
+                <div class="island"></div>
+
+                <div id="statusbar">
+                    <span id="sb-time">9:41</span>
+                    <div class="sb-right">
+                        <svg class="sb-signal" viewBox="0 0 18 12" width="18" height="12">
+                            <rect x="0"  y="8" width="3" height="4"  rx="1"></rect>
+                            <rect x="5"  y="5" width="3" height="7"  rx="1"></rect>
+                            <rect x="10" y="2" width="3" height="10" rx="1"></rect>
+                            <rect x="15" y="0" width="3" height="12" rx="1"></rect>
+                        </svg>
+                        <svg class="sb-battery" viewBox="0 0 27 12" width="27" height="12">
+                            <rect x="0" y="0" width="23" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-opacity="0.4" stroke-width="1"></rect>
+                            <rect id="sb-batt-fill" x="2" y="2" width="19" height="8" rx="2"></rect>
+                            <rect x="24" y="4" width="2.5" height="4" rx="1" opacity="0.4"></rect>
+                        </svg>
+                    </div>
+                </div>
+
+                <div id="bootscreen" class="hidden">
+                    <div class="boot-logo"></div>
+                    <div class="boot-name">CipherOS</div>
+                    <div class="boot-track"><div class="boot-fill"></div></div>
+                </div>
+
+                <div id="lockscreen">
+                    <div class="ls-clock">
+                        <div id="ls-date">Monday, September 1</div>
+                        <div id="ls-time">9:41</div>
+                    </div>
+                    <div id="ls-notifs"></div>
+                    <div class="ls-hint">Swipe up to unlock</div>
+                    <div id="ls-camera" title="Camera">
+                        <svg viewBox="0 0 24 24"><path d="M9 4l-1.2 2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2.8L15 4H9zm3 4.5A4.5 4.5 0 1 1 12 17.5 4.5 4.5 0 0 1 12 8.5z"/></svg>
+                    </div>
+                </div>
+
+                <div id="homescreen" class="hidden">
+                    <div id="app-grid"></div>
+                    <div id="dock"></div>
+                </div>
+
+                <div id="app-layer" class="hidden"></div>
+
+                <div id="notif-center" class="hidden">
+                    <div class="nc-header">
+                        <span>Notifications</span>
+                        <button id="nc-clear">Clear</button>
+                    </div>
+                    <div id="nc-list"></div>
+                </div>
+
+                <div id="toasts"></div>
+
+                <div id="home-indicator"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/os/nui.js"></script>
+    <script src="js/os/devmock.js"></script>
+    <script src="js/os/statusbar.js"></script>
+    <script src="js/os/sounds.js"></script>
+    <script src="js/os/notify.js"></script>
+    <script src="js/os/apps.js"></script>
+    <script src="js/os/ui.js"></script>
+    <script src="js/os/router.js"></script>
+
+    <script src="js/apps/phone.js"></script>
+    <script src="js/apps/messages.js"></script>
+    <script src="js/apps/contacts.js"></script>
+    <script src="js/apps/settings.js"></script>
+    <script src="js/apps/camera.js"></script>
+    <script src="js/apps/gallery.js"></script>
+    <script src="js/apps/wallet.js"></script>
+    <script src="js/apps/notes.js"></script>
+    <script src="js/apps/clock.js"></script>
+    <script src="js/apps/calculator.js"></script>
+    <script src="js/apps/social.js"></script>
+    <script src="js/apps/mail.js"></script>
+    <script src="js/apps/market.js"></script>
+    <script src="js/apps/services.js"></script>
+    <script src="js/apps/darkchat.js"></script>
+    <script src="js/apps/prism.js"></script>
+    <script src="js/apps/garage.js"></script>
+    <script src="js/apps/music.js"></script>
+    <script src="js/apps/weather.js"></script>
+    <script src="js/apps/appstore.js"></script>
+    <script src="js/apps/match.js"></script>
+    <script src="js/apps/game2048.js"></script>
+    <script src="js/apps/snake.js"></script>
+    <script src="js/os/setup.js"></script>
+    <script src="js/os/shell.js"></script>
+</body>
+</html>
