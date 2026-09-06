@@ -198,7 +198,7 @@ PhoneCallback('cipher-phone:calls:history', function(src)
         local outgoing = r.caller == me
         out[#out + 1] = {
             number = outgoing and r.callee
-                or (r.anonymous == 1 and 'Anonymous' or r.caller),
+                or (DbBool(r.anonymous) and 'Anonymous' or r.caller),
             direction = outgoing and 'out' or 'in',
             state = r.state,
             duration = r.duration,

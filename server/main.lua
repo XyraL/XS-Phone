@@ -43,11 +43,27 @@ function GetPhoneNumber(src)
 end
 
 function GetSourceByNumber(number)
-    return byNumber[number]
+    local src = byNumber[number]
+    if src then return src end
+
+    AwaitDB()
+    local citizenid = MySQL.scalar.await(
+        'SELECT citizenid FROM phone_phones WHERE number = ?', { number })
+    if not citizenid then return nil end
+
+    for _, id in ipairs(GetPlayers()) do
+        local s = tonumber(id)
+        if Framework.GetCitizenId(s) == citizenid then
+            local entry = EnsurePhone(s)
+            if entry and entry.number == number then return s end
+            return byNumber[number]
+        end
+    end
+    return nil
 end
 
 function GetSettingsByNumber(number)
-    local src = byNumber[number]
+    local src = GetSourceByNumber(number)
     return src and bySrc[src] and bySrc[src].settings or nil
 end
 
@@ -77,6 +93,16 @@ local function withDefaults(settings)
     end
     return merged
 end
+
+AddEventHandler('onResourceStart', function(res)
+    if res ~= GetCurrentResourceName() then return end
+    CreateThread(function()
+        AwaitDB()
+        for _, id in ipairs(GetPlayers()) do
+            EnsurePhone(tonumber(id))
+        end
+    end)
+end)
 
 function EnsurePhone(src)
     local cached = bySrc[src]

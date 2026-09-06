@@ -3,6 +3,29 @@
     right: 2vw;
     bottom: 2.5vh;
 }
+#phone-root.peek-in,
+#phone-root.peek-out {
+    transition: transform 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+    pointer-events: none;
+}
+#phone-root.peek-in  { transform: translateY(calc(100% - 150px)) !important; }
+#phone-root.peek-out { transform: translateY(calc(100% + 60px)) !important; }
+
+#ls-notifs .notif-card {
+    cursor: grab;
+    user-select: none;
+    touch-action: pan-y;
+    will-change: transform, opacity;
+}
+#ls-notifs .notif-card:active { cursor: grabbing; }
+
+#statusbar.airplane .sb-signal { display: none; }
+#statusbar.airplane .sb-right::before {
+    content: '✈';
+    font-size: 12px;
+    line-height: 1;
+    margin-right: 3px;
+}
 
 #phone-frame {
     position: relative;

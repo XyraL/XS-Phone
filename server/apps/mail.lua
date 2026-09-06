@@ -115,7 +115,7 @@ PhoneCallback('cipher-phone:mail:list', function(src, data)
         FROM phone_emails WHERE owner_address = ? AND folder = ?
         ORDER BY id DESC LIMIT 100
     ]], { acct.address, folder })
-    for _, r in ipairs(rows) do r.isRead = r.isRead == 1 end
+    for _, r in ipairs(rows) do r.isRead = DbBool(r.isRead) end
     return { ok = true, data = rows }
 end)
 

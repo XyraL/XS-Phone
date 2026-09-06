@@ -5,9 +5,15 @@ local PAGE_SIZE = 50
 
 local function pushTo(number, payload)
     local tgt = GetSourceByNumber(number)
-    if not tgt then return end
+    if not tgt then
+        if Config.Debug then print(('^3[cipher-phone]^0 text to %s not pushed: offline'):format(number)) end
+        return
+    end
     local settings = GetSettingsByNumber(number)
-    if settings and settings.airplane then return end
+    if settings and settings.airplane then
+        if Config.Debug then print(('^3[cipher-phone]^0 text to %s not pushed: airplane mode'):format(number)) end
+        return
+    end
     local sender = payload.message and payload.message.sender
     if sender then
         payload.fromName = MySQL.scalar.await(
@@ -60,7 +66,11 @@ local function deliver(threadId, sender, body, mediaUrl)
         'SELECT number, muted FROM phone_thread_members WHERE thread_id = ? AND number != ?',
         { threadId, sender })
     for _, m in ipairs(others) do
-        if m.muted == 0 and not IsBlockedBy(m.number, sender) then
+        if DbBool(m.muted) then
+            if Config.Debug then print(('^3[cipher-phone]^0 text to %s not pushed: thread muted (muted=%s)'):format(m.number, tostring(m.muted))) end
+        elseif IsBlockedBy(m.number, sender) then
+            if Config.Debug then print(('^3[cipher-phone]^0 text to %s not pushed: sender %s blocked'):format(m.number, sender)) end
+        else
             pushTo(m.number, { threadId = threadId, message = message })
         end
     end

@@ -26,7 +26,7 @@ local function queryPosts(me, extraWhere, params, limit)
     for _, r in ipairs(rows) do
         r.mine = r.mine == 1
         r.liked = r.liked == 1
-        r.verified = r.verified == 1
+        r.verified = DbBool(r.verified)
     end
     return rows
 end
@@ -181,7 +181,7 @@ PhoneCallback('cipher-phone:prism:profile', function(src, data)
     return { ok = true, data = {
         profile = {
             handle = row.handle, display = row.display, bio = row.bio,
-            avatar = row.avatar, verified = row.verified == 1,
+            avatar = row.avatar, verified = DbBool(row.verified),
             isMe = row.number == me, following = following,
             followers = followers, followingCount = followingCount,
             posts = #posts,

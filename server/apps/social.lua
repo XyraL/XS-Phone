@@ -34,7 +34,7 @@ local function publicProfile(row)
     if not row then return nil end
     return {
         handle = row.handle, display = row.display, bio = row.bio,
-        avatar = row.avatar, banner = row.banner, verified = row.verified == 1,
+        avatar = row.avatar, banner = row.banner, verified = DbBool(row.verified),
     }
 end
 
@@ -57,7 +57,7 @@ local function queryPosts(me, extraWhere, params, limit)
     for _, r in ipairs(rows) do
         r.mine = r.mine == 1
         r.liked = r.liked == 1
-        r.verified = r.verified == 1
+        r.verified = DbBool(r.verified)
     end
     return rows
 end

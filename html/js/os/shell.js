@@ -22,6 +22,7 @@ PhoneOS.shell = (() => {
             el.classList.add(`wp-${s.wallpaper}`, `theme-${s.theme}`);
         }
         el.classList.add(`accent-${s.accent || 'blue'}`, `ts-${s.textScale || 'default'}`);
+        document.getElementById('statusbar').classList.toggle('airplane', !!s.airplane);
         PhoneOS.clock.tick();
     }
 
@@ -149,6 +150,7 @@ PhoneOS.shell = (() => {
         applySettings();
         buildHome();
         lock();
+        if (PhoneOS.endPeek) PhoneOS.endPeek();
         document.getElementById('phone-root').classList.remove('hidden');
 
         if (!data.settings.setupDone && PhoneOS.setup) {
@@ -222,8 +224,10 @@ PhoneOS.shell = (() => {
         unlock();
     }
 
-    PhoneOS.isOpen = () =>
-        !document.getElementById('phone-root').classList.contains('hidden');
+    PhoneOS.isOpen = () => {
+        const c = document.getElementById('phone-root').classList;
+        return !c.contains('hidden') && !c.contains('peek-in') && !c.contains('peek-out');
+    };
 
     return { open, close, lock, unlock, isLocked: () => locked, applySettings, finishSetup };
 })();

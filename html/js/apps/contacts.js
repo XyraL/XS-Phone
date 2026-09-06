@@ -221,7 +221,7 @@
         }
     });
 
-    function formScreen(view, existing) {
+    function formScreen(view, existing, prefill) {
         view.textContent = '';
         view.append(ui.header('', {
             back: {
@@ -261,7 +261,10 @@
         content.append(photoWrap);
 
         const nameInput = ui.textInput({ placeholder: 'Name', value: existing && existing.name });
-        const numberInput = ui.textInput({ placeholder: 'Number (e.g. 555-0142)', value: existing && existing.number });
+        const numberInput = ui.textInput({
+            placeholder: 'Number (e.g. 555-0142)',
+            value: (existing && existing.number) || (prefill && prefill.number) || '',
+        });
         numberInput.inputMode = 'tel';
 
         const form = document.createElement('div');
@@ -304,10 +307,21 @@
         nameInput.focus();
     }
 
+    async function openByNumber(view, number) {
+        const contacts = await PhoneOS.loadContacts();
+        const digits = String(number).replace(/\D/g, '');
+        const hit = (contacts || []).find((c) => c.number === number
+            || (digits && c.number.replace(/\D/g, '') === digits));
+        if (hit) return detailScreen(view, hit);
+        return formScreen(view, null, { number });
+    }
+
     PhoneOS.registerApp({
         id: 'contacts', name: 'Contacts', dock: true,
         iconBg: 'linear-gradient(135deg,#a8a8ad,#69696e)',
         glyph: PhoneOS.glyphs.contacts,
-        render: listScreen,
+        render: (view, params) => (params && params.number)
+            ? openByNumber(view, params.number)
+            : listScreen(view),
     });
 })();

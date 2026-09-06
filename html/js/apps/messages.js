@@ -93,13 +93,19 @@
         back.className = 'ah-back';
         back.textContent = 'Messages';
         back.addEventListener('click', () => threadsScreen(view));
-        const center = document.createElement('div');
+        const center = document.createElement('button');
+        center.type = 'button';
         center.className = 'imsg-head-center';
+        center.title = thread && thread.isGroup ? 'Group info' : 'Contact';
         center.append(ui.avatar(title, 40, otherNumber ? PhoneOS.contactAvatar(otherNumber) : null));
         const nm = document.createElement('div');
         nm.className = 'imsg-head-name';
         nm.textContent = title;
         center.append(nm);
+        center.addEventListener('click', () => {
+            if (thread && thread.isGroup) optionsScreen(view, thread);
+            else if (otherNumber) contactSheet(otherNumber, title);
+        });
         head.append(back, center);
         if (thread) {
             const opts = document.createElement('button');
@@ -394,6 +400,52 @@
         });
         content.append(create);
         view.append(content);
+    }
+
+    async function contactSheet(number, title) {
+        const contacts = await PhoneOS.loadContacts();
+        const digits = String(number).replace(/\D/g, '');
+        const saved = (contacts || []).find((c) => c.number === number
+            || (digits && c.number.replace(/\D/g, '') === digits));
+
+        const overlay = document.createElement('div');
+        overlay.className = 'picker-overlay';
+        const sheet = document.createElement('div');
+        sheet.className = 'picker-sheet contact-sheet';
+
+        const hero = document.createElement('div');
+        hero.className = 'cs-hero';
+        hero.append(ui.avatar(title, 72, PhoneOS.contactAvatar(number)));
+        const name = document.createElement('div');
+        name.className = 'cs-name';
+        name.textContent = saved ? saved.name : (title !== number ? title : 'Unknown number');
+        const num = document.createElement('div');
+        num.className = 'cs-num';
+        num.textContent = number;
+        hero.append(name, num);
+
+        const call = document.createElement('button');
+        call.className = 'confirm-btn confirm-primary';
+        call.textContent = 'Call';
+        call.addEventListener('click', () => { overlay.remove(); PhoneOS.startCall(number); });
+
+        const contact = document.createElement('button');
+        contact.className = 'confirm-btn';
+        contact.textContent = saved ? 'View Contact' : 'Add Contact';
+        contact.addEventListener('click', () => {
+            overlay.remove();
+            PhoneOS.router.openApp('contacts', null, { number });
+        });
+
+        const cancel = document.createElement('button');
+        cancel.className = 'confirm-btn';
+        cancel.textContent = 'Cancel';
+        cancel.addEventListener('click', () => overlay.remove());
+
+        sheet.append(hero, call, contact, cancel);
+        overlay.append(sheet);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        document.getElementById('phone-screen').append(overlay);
     }
 
     PhoneOS.on('phone:newMessage', (data) => {

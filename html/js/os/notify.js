@@ -47,18 +47,109 @@ PhoneOS.notifications = [];
         for (const n of PhoneOS.notifications) list.append(card(n));
     }
 
+    // Swipe a lock-screen card sideways to clear it. The lock screen captures
+    // pointers for swipe-to-unlock, so the card stops propagation and handles a
+    // plain tap itself (tap still unlocks, like tapping anywhere else).
+    function attachSwipe(el, n) {
+        let startX = null;
+        let dx = 0;
+        el.addEventListener('pointerdown', (e) => {
+            e.stopPropagation();
+            startX = e.clientX;
+            dx = 0;
+            el.style.transition = 'none';
+            try { el.setPointerCapture(e.pointerId); } catch (err) {}
+        });
+        el.addEventListener('pointermove', (e) => {
+            if (startX === null) return;
+            dx = e.clientX - startX;
+            el.style.transform = `translateX(${dx}px)`;
+            el.style.opacity = String(Math.max(0.15, 1 - Math.abs(dx) / 220));
+        });
+        const end = (e) => {
+            if (startX === null) return;
+            e.stopPropagation();
+            startX = null;
+            if (Math.abs(dx) > 90) {
+                el.style.transition = 'transform 0.18s, opacity 0.18s';
+                el.style.transform = `translateX(${dx > 0 ? 420 : -420}px)`;
+                el.style.opacity = '0';
+                setTimeout(() => {
+                    const i = PhoneOS.notifications.indexOf(n);
+                    if (i >= 0) PhoneOS.notifications.splice(i, 1);
+                    renderCenter();
+                    renderLockPreviews();
+                }, 180);
+            } else {
+                el.style.transition = 'transform 0.2s, opacity 0.2s';
+                el.style.transform = '';
+                el.style.opacity = '';
+                if (Math.abs(dx) < 8 && PhoneOS.shell) PhoneOS.shell.unlock();
+            }
+        };
+        el.addEventListener('pointerup', end);
+        el.addEventListener('pointercancel', end);
+    }
+
     function renderLockPreviews() {
         const box = document.getElementById('ls-notifs');
         box.textContent = '';
-        for (const n of PhoneOS.notifications.slice(0, 3)) box.append(card(n, true));
+        for (const n of PhoneOS.notifications.slice(0, 3)) {
+            const el = card(n, true);
+            attachSwipe(el, n);
+            box.append(el);
+        }
+    }
+
+    function callIsUp() {
+        const call = document.getElementById('call-overlay');
+        return !!call && !call.classList.contains('hidden');
     }
 
     function toast(n) {
+        if (callIsUp()) return;
         const el = card(n);
         const layer = document.getElementById('toasts');
         layer.append(el);
         setTimeout(() => el.classList.add('out'), 3600);
         setTimeout(() => el.remove(), 3950);
+    }
+
+    // Phone is closed → slide it up from the bottom edge just far enough to show
+    // the banner on the lock screen, then tuck it back away. A second notification
+    // while peeking just extends the hold.
+    let peekTimer = null;
+    let peekHide = null;
+    function endPeek() {
+        clearTimeout(peekTimer);
+        clearTimeout(peekHide);
+        peekTimer = peekHide = null;
+        document.getElementById('phone-root').classList.remove('peek-in', 'peek-out');
+    }
+    PhoneOS.endPeek = endPeek;
+
+    function peek() {
+        const root = document.getElementById('phone-root');
+        const call = document.getElementById('call-overlay');
+        if (call && !call.classList.contains('hidden')) return;
+        clearTimeout(peekTimer);
+        clearTimeout(peekHide);
+        root.classList.remove('hidden');
+        if (!root.classList.contains('peek-in')) {
+            root.classList.add('peek-out');
+            void root.offsetWidth;
+            root.classList.remove('peek-out');
+            root.classList.add('peek-in');
+        }
+        peekTimer = setTimeout(() => {
+            root.classList.remove('peek-in');
+            root.classList.add('peek-out');
+            peekHide = setTimeout(() => {
+                root.classList.remove('peek-out');
+                root.classList.add('hidden');
+                peekTimer = peekHide = null;
+            }, 420);
+        }, 3600);
     }
 
     PhoneOS.notify = function (n) {
@@ -71,6 +162,7 @@ PhoneOS.notifications = [];
         if (!dnd) {
             toast(n);
             PhoneOS.sounds.playText(PhoneOS.state && PhoneOS.state.settings.texttone);
+            if (typeof PhoneOS.isOpen === 'function' && !PhoneOS.isOpen()) peek();
         }
         if (PhoneOS.bumpBadge) PhoneOS.bumpBadge(n.app);
         renderCenter();
@@ -78,6 +170,7 @@ PhoneOS.notifications = [];
     };
 
     PhoneOS.on('phone:notify', (n) => PhoneOS.notify(n));
+    PhoneOS.on('phone:open', renderLockPreviews);
 
     document.addEventListener('DOMContentLoaded', () => {
         const center = document.getElementById('notif-center');

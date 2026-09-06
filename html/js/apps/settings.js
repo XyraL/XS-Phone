@@ -35,7 +35,7 @@
 
     const settingToggle = (key) => ui.toggle(!!PhoneOS.state.settings[key], (on) => {
         PhoneOS.state.settings[key] = on;
-        PhoneOS.clock.tick(); // 24-hour toggle repaints immediately
+        PhoneOS.shell.applySettings();
         save();
     });
 

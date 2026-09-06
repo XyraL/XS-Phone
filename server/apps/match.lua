@@ -14,7 +14,7 @@ local function myProfile(number)
         { number })
     if not row then return nil end
     row.photos = json.decode(row.photos) or {}
-    row.active = row.active == 1
+    row.active = DbBool(row.active)
     return row
 end
 

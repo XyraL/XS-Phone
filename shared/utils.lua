@@ -10,3 +10,7 @@ function NormalizeNumber(input)
         return digits:sub(i, i)
     end))
 end
+
+function DbBool(v)
+    return v == true or v == 1 or v == '1'
+end
