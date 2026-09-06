@@ -2,6 +2,15 @@
 
 All notable changes to **Cipher — Phone**.
 
+## [1.0.1] — 2026-09-04
+
+### Fixed
+- Texts that arrive while your phone is closed now show a real notification —
+  who sent it and a preview of the message — and play the phone's text tone.
+  Before it was a generic "You received a new message" with no sound, so
+  incoming texts were easy to miss entirely. The sender's name comes from
+  your saved contacts, falling back to their number.
+
 ## [1.0.0] — 2026-09-04
 
 First release.

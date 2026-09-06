@@ -8,6 +8,12 @@ local function pushTo(number, payload)
     if not tgt then return end
     local settings = GetSettingsByNumber(number)
     if settings and settings.airplane then return end
+    local sender = payload.message and payload.message.sender
+    if sender then
+        payload.fromName = MySQL.scalar.await(
+            'SELECT name FROM phone_contacts WHERE owner_number = ? AND saved_number = ?',
+            { number, sender }) or sender
+    end
     TriggerClientEvent('cipher-phone:client:newMessage', tgt, payload)
 end
 

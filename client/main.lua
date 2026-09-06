@@ -175,7 +175,15 @@ end
 RegisterNetEvent('cipher-phone:client:newMessage', function(payload)
     SendNUIMessage({ action = 'phone:newMessage', data = payload })
     if not phoneOpen and not quietMode() then
-        Framework.Notify('You received a new message', 'inform')
+        local msg = payload.message or {}
+        local who = payload.fromName or msg.sender or 'New message'
+        local body = msg.body
+        if not body or body == '' then
+            body = msg.media and 'Sent a photo' or 'New message'
+        end
+        if #body > 80 then body = body:sub(1, 77) .. '...' end
+        Framework.Notify(who .. ': ' .. body, 'inform')
+        PlaySoundFrontend(-1, 'Text_Arrive_Tone', 'Phone_SoundSet_Default', true)
     end
 end)
 

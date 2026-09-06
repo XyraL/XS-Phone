@@ -5,7 +5,7 @@ lua54 'yes'
 name 'cipher-phone'
 author 'XyraL'
 description 'Cipher — Phone. iPhone-style smartphone for QBox/QBCore.'
-version '1.0.0'
+version '1.0.1'
 
 dependencies {
     'ox_lib',
