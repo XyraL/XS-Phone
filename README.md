@@ -1,19 +1,19 @@
-<h1 align="center">Cipher Phone</h1>
+<h1 align="center">XS-Phone</h1>
 
 <p align="center">A smartphone for <strong>QBox</strong> and <strong>QBCore</strong>. Calls, texts, social media, 20 apps, one resource.</p>
 
 <p align="center">
-  <a href="https://github.com/XyraL/cipher-phone/releases"><img src="https://img.shields.io/github/v/release/XyraL/cipher-phone?style=flat-square&color=f5bb55&label=release" alt="Latest release"></a>
+  <a href="https://github.com/XyraL/XS-Phone/releases"><img src="https://img.shields.io/github/v/release/XyraL/XS-Phone?style=flat-square&color=f5bb55&label=release" alt="Latest release"></a>
   <img src="https://img.shields.io/badge/framework-QBox%20%7C%20QBCore-55dcff?style=flat-square" alt="framework">
   <img src="https://img.shields.io/badge/price-free-30d158?style=flat-square" alt="price">
-  <a href="https://xyralscripts.dev/docs-cipher-phone"><img src="https://img.shields.io/badge/docs-xyralscripts.dev-a889ff?style=flat-square" alt="docs"></a>
+  <a href="https://xyralscripts.dev/docs-xs-phone"><img src="https://img.shields.io/badge/docs-xyralscripts.dev-a889ff?style=flat-square" alt="docs"></a>
   <a href="https://discord.gg/XRURAw4TM2"><img src="https://img.shields.io/badge/support-discord-5865F2?style=flat-square" alt="support"></a>
 </p>
 
 <p align="center">
-  <a href="https://xyralscripts.dev/cipher-phone">Website</a> &nbsp;·&nbsp;
-  <a href="https://xyralscripts.dev/docs-cipher-phone">Setup guide</a> &nbsp;·&nbsp;
-  <a href="https://github.com/XyraL/cipher-phone/releases">Releases</a> &nbsp;·&nbsp;
+  <a href="https://xyralscripts.dev/xs-phone">Website</a> &nbsp;·&nbsp;
+  <a href="https://xyralscripts.dev/docs-xs-phone">Setup guide</a> &nbsp;·&nbsp;
+  <a href="https://github.com/XyraL/XS-Phone/releases">Releases</a> &nbsp;·&nbsp;
   <a href="https://discord.gg/XRURAw4TM2">Discord</a>
 </p>
 
@@ -70,7 +70,7 @@ the phone mid-anything and it reopens right where you left it.
 1. Drop the folder into `resources`.
 2. No SQL import needed. Tables create themselves on first start. The file in
    `sql/` is only there if you want to run it yourself.
-3. Add `ensure cipher-phone` to your server.cfg, after ox_lib, oxmysql, your
+3. Add `ensure XS-Phone` to your server.cfg, after ox_lib, oxmysql, your
    framework and pma-voice.
 4. Both frameworks already ship a `phone` item, and the phone uses it as is —
    most servers can skip this step. Only add the item if your server doesn't
@@ -110,15 +110,15 @@ the phone mid-anything and it reopens right where you left it.
 
 ```lua
 -- server
-exports['cipher-phone']:GetNumber(source)
-exports['cipher-phone']:Notify(source, { app = 'mail', title = '...', body = '...' })
-exports['cipher-phone']:SendMessage('BANK', number, 'You were paid $2,500.')
-exports['cipher-phone']:SendMail(number, { from = 'cityhall@ls.mail', subject = '...', body = '...' })
+exports['XS-Phone']:GetNumber(source)
+exports['XS-Phone']:Notify(source, { app = 'mail', title = '...', body = '...' })
+exports['XS-Phone']:SendMessage('BANK', number, 'You were paid $2,500.')
+exports['XS-Phone']:SendMail(number, { from = 'cityhall@ls.mail', subject = '...', body = '...' })
 -- SendMail delivers to whatever mail account is logged in on that player's
 -- phone. No account, no delivery — it returns false.
 
 -- client
-exports['cipher-phone']:IsPhoneOpen()
+exports['XS-Phone']:IsPhoneOpen()
 ```
 
 ## If something's not working
@@ -132,17 +132,17 @@ exports['cipher-phone']:IsPhoneOpen()
   `Config.Phone.Garage.table` at it.
 - **Music won't play**: xsound isn't installed.
 
-## The rest of the Cipher line
+## My other scripts
 
 | Script | What it is |
 |---|---|
-| [cipher](https://github.com/XyraL/cipher) | Gang ops — territory, boosting, contracts |
-| [cipher-mdt](https://github.com/XyraL/cipher-mdt) | Police/EMS/Fire MDT and dispatch |
-| [cipher-admin](https://github.com/XyraL/cipher-admin) | Admin panel and moderation suite |
-| [cipher-trucking](https://github.com/XyraL/cipher-trucking) | Civilian trucking career |
-| [cipher-drone](https://github.com/XyraL/cipher-drone) | Police drone system |
-| [cipher-multicharacter](https://github.com/XyraL/cipher-multicharacter) | Character select |
-| [cipher-dispatch](https://github.com/XyraL/cipher-dispatch) | Standalone dispatch |
+| [XS-CriminalTablet](https://github.com/XyraL/XS-CriminalTablet) | Gang ops — territory, boosting, contracts |
+| [XS-MDT](https://github.com/XyraL/XS-MDT) | Police/EMS/Fire MDT and dispatch |
+| [XS-AdminMenu](https://github.com/XyraL/XS-AdminMenu) | Admin panel and moderation suite |
+| [XS-Trucking](https://github.com/XyraL/XS-Trucking) | Civilian trucking career |
+| [XS-Drone](https://github.com/XyraL/XS-Drone) | Police drone system |
+| [XS-MultiCharacter](https://github.com/XyraL/XS-MultiCharacter) | Character select |
+| [XS-Dispatch](https://github.com/XyraL/XS-Dispatch) | Standalone dispatch |
 
 ## License
 

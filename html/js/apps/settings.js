@@ -10,7 +10,7 @@
         { id: 'emerald',  name: 'Emerald' },
         { id: 'gold',     name: 'Gold' },
         { id: 'graphite', name: 'Graphite' },
-        { id: 'cipher',   name: 'Cipher' },
+        { id: 'xyral',    name: 'XyraL' },
     ];
     const ACCENTS = ['blue', 'teal', 'amber', 'purple', 'green', 'rose'];
     const TEXT_SCALES = [['small', 'Small'], ['default', 'Default'], ['large', 'Large']];
@@ -167,7 +167,7 @@
 
         const footer = document.createElement('div');
         footer.className = 'about-footer';
-        footer.textContent = 'cipher-phone by XyraL';
+        footer.textContent = 'XS-Phone by XyraL';
         content.append(footer);
 
         view.append(content);

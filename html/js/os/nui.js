@@ -4,7 +4,7 @@ window.PhoneOS = {
     handlers: {},
 };
 
-PhoneOS.resource = PhoneOS.IN_GAME ? GetParentResourceName() : 'cipher-phone';
+PhoneOS.resource = PhoneOS.IN_GAME ? GetParentResourceName() : 'XS-Phone';
 
 PhoneOS.nui = async function (name, data) {
     if (!PhoneOS.IN_GAME) return PhoneOS.mock(name, data);
@@ -16,7 +16,7 @@ PhoneOS.nui = async function (name, data) {
         });
         return await res.json();
     } catch (e) {
-        console.error(`[cipher-phone] nui ${name} failed`, e);
+        console.error(`[XS-Phone] nui ${name} failed`, e);
         return { ok: false, error: 'transport' };
     }
 };
@@ -28,7 +28,7 @@ PhoneOS.on = function (action, fn) {
 PhoneOS.dispatch = function (action, data) {
     for (const fn of PhoneOS.handlers[action] || []) {
         try { fn(data); } catch (e) {
-            console.error(`[cipher-phone] ${action} handler failed`, e);
+            console.error(`[XS-Phone] ${action} handler failed`, e);
         }
     }
 };
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setupDone: !window.location.search.includes('setup=1'),
             },
             installedApps: ['social', 'prism', 'market', 'music', 'weather'],
-            os: 'CipherOS',
+            os: 'XyraLOS',
             appNames: { social: 'Chirp', darkchat: 'DarkChat' },
             version: '0.8.0-dev',
             badges: { messages: 1, mail: 1 },

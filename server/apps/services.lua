@@ -31,7 +31,7 @@ function GetDutyRoster(job)
     return count, sources
 end
 
-PhoneCallback('cipher-phone:city:list', function(src)
+PhoneCallback('XS-Phone:city:list', function(src)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     AwaitDB()
@@ -62,7 +62,7 @@ PhoneCallback('cipher-phone:city:list', function(src)
     return { ok = true, data = out }
 end)
 
-PhoneCallback('cipher-phone:city:setAnnouncement', function(src, data)
+PhoneCallback('XS-Phone:city:setAnnouncement', function(src, data)
     if not RateOK(src, 'businessWrite') then return { ok = false, error = 'rate_limited' } end
 
     local myJob = Framework.GetJobInfo(src)

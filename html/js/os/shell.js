@@ -143,7 +143,7 @@ PhoneOS.shell = (() => {
         if (prevNumber && prevNumber !== data.number) PhoneOS.router.home();
         PhoneOS.state = data;
         PhoneOS.data = { contacts: null, threads: null, photos: null };
-        document.querySelector('#bootscreen .boot-name').textContent = data.os || 'CipherOS';
+        document.querySelector('#bootscreen .boot-name').textContent = data.os || 'XyraLOS';
         for (const [app, count] of Object.entries(data.badges || {})) {
             if (count > 0) PhoneOS.badges[app] = count;
         }

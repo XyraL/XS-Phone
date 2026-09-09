@@ -1,115 +1,115 @@
 local API = {
-    ['contacts:list']        = 'cipher-phone:contacts:list',
-    ['contacts:add']         = 'cipher-phone:contacts:add',
-    ['contacts:update']      = 'cipher-phone:contacts:update',
-    ['contacts:delete']      = 'cipher-phone:contacts:delete',
-    ['contacts:favorite']    = 'cipher-phone:contacts:favorite',
-    ['contacts:block']       = 'cipher-phone:contacts:block',
+    ['contacts:list']        = 'XS-Phone:contacts:list',
+    ['contacts:add']         = 'XS-Phone:contacts:add',
+    ['contacts:update']      = 'XS-Phone:contacts:update',
+    ['contacts:delete']      = 'XS-Phone:contacts:delete',
+    ['contacts:favorite']    = 'XS-Phone:contacts:favorite',
+    ['contacts:block']       = 'XS-Phone:contacts:block',
 
-    ['messages:threads']     = 'cipher-phone:messages:threads',
-    ['messages:getThread']   = 'cipher-phone:messages:getThread',
-    ['messages:markRead']    = 'cipher-phone:messages:markRead',
-    ['messages:send']        = 'cipher-phone:messages:send',
-    ['messages:createGroup'] = 'cipher-phone:messages:createGroup',
-    ['messages:toggleMute']  = 'cipher-phone:messages:toggleMute',
-    ['messages:leave']       = 'cipher-phone:messages:leave',
+    ['messages:threads']     = 'XS-Phone:messages:threads',
+    ['messages:getThread']   = 'XS-Phone:messages:getThread',
+    ['messages:markRead']    = 'XS-Phone:messages:markRead',
+    ['messages:send']        = 'XS-Phone:messages:send',
+    ['messages:createGroup'] = 'XS-Phone:messages:createGroup',
+    ['messages:toggleMute']  = 'XS-Phone:messages:toggleMute',
+    ['messages:leave']       = 'XS-Phone:messages:leave',
 
-    ['drop:send']            = 'cipher-phone:drop:send',
+    ['drop:send']            = 'XS-Phone:drop:send',
 
-    ['calls:start']          = 'cipher-phone:calls:start',
-    ['calls:answer']         = 'cipher-phone:calls:answer',
-    ['calls:decline']        = 'cipher-phone:calls:decline',
-    ['calls:hangup']         = 'cipher-phone:calls:hangup',
-    ['calls:history']        = 'cipher-phone:calls:history',
+    ['calls:start']          = 'XS-Phone:calls:start',
+    ['calls:answer']         = 'XS-Phone:calls:answer',
+    ['calls:decline']        = 'XS-Phone:calls:decline',
+    ['calls:hangup']         = 'XS-Phone:calls:hangup',
+    ['calls:history']        = 'XS-Phone:calls:history',
 
-    ['pin:verify']           = 'cipher-phone:pin:verify',
-    ['pin:set']              = 'cipher-phone:pin:set',
+    ['pin:verify']           = 'XS-Phone:pin:verify',
+    ['pin:set']              = 'XS-Phone:pin:set',
 
-    ['gallery:list']         = 'cipher-phone:gallery:list',
-    ['gallery:save']         = 'cipher-phone:gallery:save',
-    ['gallery:delete']       = 'cipher-phone:gallery:delete',
+    ['gallery:list']         = 'XS-Phone:gallery:list',
+    ['gallery:save']         = 'XS-Phone:gallery:save',
+    ['gallery:delete']       = 'XS-Phone:gallery:delete',
 
-    ['wallet:summary']       = 'cipher-phone:wallet:summary',
-    ['wallet:transfer']      = 'cipher-phone:wallet:transfer',
+    ['wallet:summary']       = 'XS-Phone:wallet:summary',
+    ['wallet:transfer']      = 'XS-Phone:wallet:transfer',
 
-    ['notes:list']           = 'cipher-phone:notes:list',
-    ['notes:save']           = 'cipher-phone:notes:save',
-    ['notes:delete']         = 'cipher-phone:notes:delete',
+    ['notes:list']           = 'XS-Phone:notes:list',
+    ['notes:save']           = 'XS-Phone:notes:save',
+    ['notes:delete']         = 'XS-Phone:notes:delete',
 
-    ['alarms:list']          = 'cipher-phone:alarms:list',
-    ['alarms:save']          = 'cipher-phone:alarms:save',
-    ['alarms:toggle']        = 'cipher-phone:alarms:toggle',
-    ['alarms:delete']        = 'cipher-phone:alarms:delete',
+    ['alarms:list']          = 'XS-Phone:alarms:list',
+    ['alarms:save']          = 'XS-Phone:alarms:save',
+    ['alarms:toggle']        = 'XS-Phone:alarms:toggle',
+    ['alarms:delete']        = 'XS-Phone:alarms:delete',
 
-    ['social:me']            = 'cipher-phone:social:me',
-    ['social:createProfile'] = 'cipher-phone:social:createProfile',
-    ['social:updateProfile'] = 'cipher-phone:social:updateProfile',
-    ['social:feed']          = 'cipher-phone:social:feed',
-    ['social:post']          = 'cipher-phone:social:post',
-    ['social:like']          = 'cipher-phone:social:like',
-    ['social:delete']        = 'cipher-phone:social:delete',
-    ['social:thread']        = 'cipher-phone:social:thread',
-    ['social:profile']       = 'cipher-phone:social:profile',
-    ['social:follow']        = 'cipher-phone:social:follow',
+    ['social:me']            = 'XS-Phone:social:me',
+    ['social:createProfile'] = 'XS-Phone:social:createProfile',
+    ['social:updateProfile'] = 'XS-Phone:social:updateProfile',
+    ['social:feed']          = 'XS-Phone:social:feed',
+    ['social:post']          = 'XS-Phone:social:post',
+    ['social:like']          = 'XS-Phone:social:like',
+    ['social:delete']        = 'XS-Phone:social:delete',
+    ['social:thread']        = 'XS-Phone:social:thread',
+    ['social:profile']       = 'XS-Phone:social:profile',
+    ['social:follow']        = 'XS-Phone:social:follow',
 
-    ['mail:me']              = 'cipher-phone:mail:me',
-    ['mail:signup']          = 'cipher-phone:mail:signup',
-    ['mail:login']           = 'cipher-phone:mail:login',
-    ['mail:logout']          = 'cipher-phone:mail:logout',
-    ['mail:list']            = 'cipher-phone:mail:list',
-    ['mail:send']            = 'cipher-phone:mail:send',
-    ['mail:read']            = 'cipher-phone:mail:read',
-    ['mail:delete']          = 'cipher-phone:mail:delete',
+    ['mail:me']              = 'XS-Phone:mail:me',
+    ['mail:signup']          = 'XS-Phone:mail:signup',
+    ['mail:login']           = 'XS-Phone:mail:login',
+    ['mail:logout']          = 'XS-Phone:mail:logout',
+    ['mail:list']            = 'XS-Phone:mail:list',
+    ['mail:send']            = 'XS-Phone:mail:send',
+    ['mail:read']            = 'XS-Phone:mail:read',
+    ['mail:delete']          = 'XS-Phone:mail:delete',
 
-    ['social:login']         = 'cipher-phone:social:login',
-    ['social:logout']        = 'cipher-phone:social:logout',
-    ['match:login']          = 'cipher-phone:match:login',
-    ['match:logout']         = 'cipher-phone:match:logout',
+    ['social:login']         = 'XS-Phone:social:login',
+    ['social:logout']        = 'XS-Phone:social:logout',
+    ['match:login']          = 'XS-Phone:match:login',
+    ['match:logout']         = 'XS-Phone:match:logout',
 
-    ['market:list']          = 'cipher-phone:market:list',
-    ['market:post']          = 'cipher-phone:market:post',
-    ['market:delete']        = 'cipher-phone:market:delete',
+    ['market:list']          = 'XS-Phone:market:list',
+    ['market:post']          = 'XS-Phone:market:post',
+    ['market:delete']        = 'XS-Phone:market:delete',
 
-    ['city:list']            = 'cipher-phone:city:list',
-    ['city:setAnnouncement'] = 'cipher-phone:city:setAnnouncement',
+    ['city:list']            = 'XS-Phone:city:list',
+    ['city:setAnnouncement'] = 'XS-Phone:city:setAnnouncement',
 
-    ['phone:changeNumber']   = 'cipher-phone:phone:changeNumber',
+    ['phone:changeNumber']   = 'XS-Phone:phone:changeNumber',
 
-    ['darkchat:rooms']       = 'cipher-phone:darkchat:rooms',
-    ['darkchat:create']      = 'cipher-phone:darkchat:create',
-    ['darkchat:join']        = 'cipher-phone:darkchat:join',
-    ['darkchat:messages']    = 'cipher-phone:darkchat:messages',
-    ['darkchat:send']        = 'cipher-phone:darkchat:send',
-    ['darkchat:leave']       = 'cipher-phone:darkchat:leave',
+    ['darkchat:rooms']       = 'XS-Phone:darkchat:rooms',
+    ['darkchat:create']      = 'XS-Phone:darkchat:create',
+    ['darkchat:join']        = 'XS-Phone:darkchat:join',
+    ['darkchat:messages']    = 'XS-Phone:darkchat:messages',
+    ['darkchat:send']        = 'XS-Phone:darkchat:send',
+    ['darkchat:leave']       = 'XS-Phone:darkchat:leave',
 
-    ['prism:feed']           = 'cipher-phone:prism:feed',
-    ['prism:post']           = 'cipher-phone:prism:post',
-    ['prism:like']           = 'cipher-phone:prism:like',
-    ['prism:comments']       = 'cipher-phone:prism:comments',
-    ['prism:comment']        = 'cipher-phone:prism:comment',
-    ['prism:delete']         = 'cipher-phone:prism:delete',
-    ['prism:profile']        = 'cipher-phone:prism:profile',
+    ['prism:feed']           = 'XS-Phone:prism:feed',
+    ['prism:post']           = 'XS-Phone:prism:post',
+    ['prism:like']           = 'XS-Phone:prism:like',
+    ['prism:comments']       = 'XS-Phone:prism:comments',
+    ['prism:comment']        = 'XS-Phone:prism:comment',
+    ['prism:delete']         = 'XS-Phone:prism:delete',
+    ['prism:profile']        = 'XS-Phone:prism:profile',
 
-    ['garage:list']          = 'cipher-phone:garage:list',
-    ['garage:ping']          = 'cipher-phone:garage:ping',
-    ['garage:valet']         = 'cipher-phone:garage:valet',
+    ['garage:list']          = 'XS-Phone:garage:list',
+    ['garage:ping']          = 'XS-Phone:garage:ping',
+    ['garage:valet']         = 'XS-Phone:garage:valet',
 
-    ['gallery:importUrl']    = 'cipher-phone:gallery:importUrl',
+    ['gallery:importUrl']    = 'XS-Phone:gallery:importUrl',
 
-    ['store:install']        = 'cipher-phone:store:install',
-    ['store:uninstall']      = 'cipher-phone:store:uninstall',
+    ['store:install']        = 'XS-Phone:store:install',
+    ['store:uninstall']      = 'XS-Phone:store:uninstall',
 
-    ['match:me']             = 'cipher-phone:match:me',
-    ['match:saveProfile']    = 'cipher-phone:match:saveProfile',
-    ['match:deck']           = 'cipher-phone:match:deck',
-    ['match:swipe']          = 'cipher-phone:match:swipe',
-    ['match:matches']        = 'cipher-phone:match:matches',
-    ['match:unmatch']        = 'cipher-phone:match:unmatch',
-    ['match:unswipe']        = 'cipher-phone:match:unswipe',
+    ['match:me']             = 'XS-Phone:match:me',
+    ['match:saveProfile']    = 'XS-Phone:match:saveProfile',
+    ['match:deck']           = 'XS-Phone:match:deck',
+    ['match:swipe']          = 'XS-Phone:match:swipe',
+    ['match:matches']        = 'XS-Phone:match:matches',
+    ['match:unmatch']        = 'XS-Phone:match:unmatch',
+    ['match:unswipe']        = 'XS-Phone:match:unswipe',
 
-    ['music:list']           = 'cipher-phone:music:list',
-    ['music:add']            = 'cipher-phone:music:add',
-    ['music:delete']         = 'cipher-phone:music:delete',
+    ['music:list']           = 'XS-Phone:music:list',
+    ['music:add']            = 'XS-Phone:music:add',
+    ['music:delete']         = 'XS-Phone:music:delete',
 }
 
 local function vehicleLabel(model, hash)
@@ -144,11 +144,11 @@ RegisterNUICallback('api', function(req, cb)
 end)
 
 RegisterNUICallback('dropScan', function(_, cb)
-    cb(lib.callback.await('cipher-phone:drop:scan', false, { ids = GetNearbyPlayerIds() }))
+    cb(lib.callback.await('XS-Phone:drop:scan', false, { ids = GetNearbyPlayerIds() }))
 end)
 
 RegisterNUICallback('dropRespond', function(data, cb)
-    TriggerServerEvent('cipher-phone:drop:respond', data and data.accept == true)
+    TriggerServerEvent('XS-Phone:drop:respond', data and data.accept == true)
     cb({ ok = true })
 end)
 
@@ -164,7 +164,7 @@ RegisterNUICallback('keepInput', function(data, cb)
     cb({ ok = true })
 end)
 
-local MUSIC_ID = 'cipher-phone-music'
+local MUSIC_ID = 'XS-Phone-music'
 
 RegisterNUICallback('musicPlay', function(data, cb)
     if GetResourceState('xsound') ~= 'started' then
@@ -223,7 +223,7 @@ RegisterNUICallback('getWeather', function(_, cb)
 end)
 
 RegisterNUICallback('saveSettings', function(data, cb)
-    local res = lib.callback.await('cipher-phone:saveSettings', false, data)
+    local res = lib.callback.await('XS-Phone:saveSettings', false, data)
     if res and res.ok and type(data) == 'table' then
         ClientSettings = data
     end

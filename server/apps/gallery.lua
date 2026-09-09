@@ -25,7 +25,7 @@ function IsAllowedExternalImage(url)
     return false
 end
 
-PhoneCallback('cipher-phone:gallery:list', function(src)
+PhoneCallback('XS-Phone:gallery:list', function(src)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     local rows = MySQL.query.await([[
@@ -36,7 +36,7 @@ PhoneCallback('cipher-phone:gallery:list', function(src)
     return { ok = true, data = rows }
 end)
 
-PhoneCallback('cipher-phone:gallery:save', function(src, data)
+PhoneCallback('XS-Phone:gallery:save', function(src, data)
     if not RateOK(src, 'photoSave') then return { ok = false, error = 'rate_limited' } end
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
@@ -55,7 +55,7 @@ PhoneCallback('cipher-phone:gallery:save', function(src, data)
     return { ok = true, data = { id = id, url = url, at = os.time() * 1000 } }
 end)
 
-PhoneCallback('cipher-phone:gallery:importUrl', function(src, data)
+PhoneCallback('XS-Phone:gallery:importUrl', function(src, data)
     if not RateOK(src, 'galleryImport') then return { ok = false, error = 'rate_limited' } end
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
@@ -74,7 +74,7 @@ PhoneCallback('cipher-phone:gallery:importUrl', function(src, data)
     return { ok = true, data = { id = id, url = url, at = os.time() * 1000 } }
 end)
 
-PhoneCallback('cipher-phone:gallery:delete', function(src, data)
+PhoneCallback('XS-Phone:gallery:delete', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     MySQL.update.await(

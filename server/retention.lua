@@ -29,7 +29,7 @@ local function sweep()
     end
 
     if Config.Debug and removed > 0 then
-        print(('^2[cipher-phone]^0 retention sweep removed %d rows'):format(removed))
+        print(('^2[XS-Phone]^0 retention sweep removed %d rows'):format(removed))
     end
 end
 

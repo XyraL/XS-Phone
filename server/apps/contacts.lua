@@ -7,7 +7,7 @@ local function cleanName(name)
     return name
 end
 
-PhoneCallback('cipher-phone:contacts:list', function(src)
+PhoneCallback('XS-Phone:contacts:list', function(src)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
 
@@ -26,7 +26,7 @@ local function cleanAvatar(me, url)
     return url, true
 end
 
-PhoneCallback('cipher-phone:contacts:add', function(src, data)
+PhoneCallback('XS-Phone:contacts:add', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'contactsWrite') then return { ok = false, error = 'rate_limited' } end
 
@@ -49,7 +49,7 @@ PhoneCallback('cipher-phone:contacts:add', function(src, data)
     return { ok = true, data = { id = id, number = number, name = name, avatar = avatar, favorite = 0, blocked = 0 } }
 end)
 
-PhoneCallback('cipher-phone:contacts:update', function(src, data)
+PhoneCallback('XS-Phone:contacts:update', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'contactsWrite') then return { ok = false, error = 'rate_limited' } end
 
@@ -73,7 +73,7 @@ PhoneCallback('cipher-phone:contacts:update', function(src, data)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:contacts:delete', function(src, data)
+PhoneCallback('XS-Phone:contacts:delete', function(src, data)
     if not RateOK(src, 'contactsWrite') then return { ok = false, error = 'rate_limited' } end
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
@@ -93,12 +93,12 @@ local function toggleFlag(src, id, column)
     return { ok = true }
 end
 
-PhoneCallback('cipher-phone:contacts:favorite', function(src, data)
+PhoneCallback('XS-Phone:contacts:favorite', function(src, data)
     if not RateOK(src, 'contactsWrite') then return { ok = false, error = 'rate_limited' } end
     return toggleFlag(src, data and data.id, 'favorite')
 end)
 
-PhoneCallback('cipher-phone:contacts:block', function(src, data)
+PhoneCallback('XS-Phone:contacts:block', function(src, data)
     if not RateOK(src, 'contactsWrite') then return { ok = false, error = 'rate_limited' } end
     return toggleFlag(src, data and data.id, 'blocked')
 end)

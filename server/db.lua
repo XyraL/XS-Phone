@@ -386,7 +386,7 @@ CreateThread(function()
 
     DBReady = true
     if Config.Debug then
-        print('^2[cipher-phone]^0 database ready')
+        print('^2[XS-Phone]^0 database ready')
     end
 end)
 

@@ -14,7 +14,7 @@ function GetNearbyPlayerIds()
     return ids
 end
 
-RegisterNetEvent('cipher-phone:client:dropOffer', function(offer)
+RegisterNetEvent('XS-Phone:client:dropOffer', function(offer)
     if IsPhoneOpen() then
         SendNUIMessage({ action = 'phone:dropOffer', data = offer })
         return
@@ -27,10 +27,10 @@ RegisterNetEvent('cipher-phone:client:dropOffer', function(offer)
             cancel = true,
             labels = { confirm = 'Accept', cancel = 'Decline' },
         })
-        TriggerServerEvent('cipher-phone:drop:respond', result == 'confirm')
+        TriggerServerEvent('XS-Phone:drop:respond', result == 'confirm')
     end)
 end)
 
-RegisterNetEvent('cipher-phone:client:contactsChanged', function()
+RegisterNetEvent('XS-Phone:client:contactsChanged', function()
     SendNUIMessage({ action = 'phone:contactsChanged' })
 end)

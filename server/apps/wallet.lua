@@ -1,6 +1,6 @@
 local ACCOUNT = function() return Config.Phone.Wallet.account or 'bank' end
 
-PhoneCallback('cipher-phone:wallet:summary', function(src)
+PhoneCallback('XS-Phone:wallet:summary', function(src)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
 
@@ -29,7 +29,7 @@ PhoneCallback('cipher-phone:wallet:summary', function(src)
     } }
 end)
 
-PhoneCallback('cipher-phone:wallet:transfer', function(src, data)
+PhoneCallback('XS-Phone:wallet:transfer', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'walletTransfer') then return { ok = false, error = 'rate_limited' } end
 
@@ -65,7 +65,7 @@ PhoneCallback('cipher-phone:wallet:transfer', function(src, data)
         'INSERT INTO phone_transactions (from_number, to_number, amount, note) VALUES (?, ?, ?, ?)',
         { me.number, to, amount, note ~= '' and note or nil })
 
-    TriggerClientEvent('cipher-phone:client:pushNotify', targetSrc, {
+    TriggerClientEvent('XS-Phone:client:pushNotify', targetSrc, {
         app = 'wallet', title = 'Money received',
         body = ('$%s from %s%s'):format(amount, me.number, note ~= '' and (' — ' .. note) or ''),
     })

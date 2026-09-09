@@ -2,7 +2,7 @@ function PhoneCallback(name, handler)
     lib.callback.register(name, function(source, ...)
         local ok, result = pcall(handler, source, ...)
         if not ok then
-            print(('^1[cipher-phone]^0 callback %s failed for %s: %s'):format(name, source, result))
+            print(('^1[XS-Phone]^0 callback %s failed for %s: %s'):format(name, source, result))
             return { ok = false, error = 'internal' }
         end
         return result
@@ -141,7 +141,7 @@ function EnsurePhone(src)
             { citizenid, number, json.encode(settings), json.encode(Config.Phone.Store.DefaultInstalled) })
 
         if Config.Debug then
-            print(('^2[cipher-phone]^0 assigned %s to %s'):format(number, citizenid))
+            print(('^2[XS-Phone]^0 assigned %s to %s'):format(number, citizenid))
         end
         entry = { number = number, hasPin = false, settings = settings,
             installedApps = Config.Phone.Store.DefaultInstalled }
@@ -166,7 +166,7 @@ Framework.OnPlayerLoaded(function(src)
     end)
 end)
 
-PhoneCallback('cipher-phone:hasPhone', function(src)
+PhoneCallback('XS-Phone:hasPhone', function(src)
     if not Config.Phone.Item.enabled then return { ok = true, has = true } end
     return { ok = true, has = Framework.HasItem(src, Config.Phone.Item.name) }
 end)
@@ -199,13 +199,13 @@ local function phonePayload(src)
     }
 end
 
-PhoneCallback('cipher-phone:getPhoneData', function(src)
+PhoneCallback('XS-Phone:getPhoneData', function(src)
     local data = phonePayload(src)
     if not data then return { ok = false, error = 'no_character' } end
     return { ok = true, data = data }
 end)
 
-PhoneCallback('cipher-phone:phone:changeNumber', function(src)
+PhoneCallback('XS-Phone:phone:changeNumber', function(src)
     if not RateOK(src, 'numberChange') then return { ok = false, error = 'rate_limited' } end
 
     local entry = EnsurePhone(src)
@@ -285,7 +285,7 @@ local function saveInstalled(src, entry)
         { json.encode(entry.installedApps), citizenid })
 end
 
-PhoneCallback('cipher-phone:store:install', function(src, data)
+PhoneCallback('XS-Phone:store:install', function(src, data)
     if not RateOK(src, 'storeWrite') then return { ok = false, error = 'rate_limited' } end
     local entry = EnsurePhone(src)
     if not entry then return { ok = false, error = 'no_character' } end
@@ -304,7 +304,7 @@ PhoneCallback('cipher-phone:store:install', function(src, data)
     return { ok = true, data = { installed = entry.installedApps } }
 end)
 
-PhoneCallback('cipher-phone:store:uninstall', function(src, data)
+PhoneCallback('XS-Phone:store:uninstall', function(src, data)
     if not RateOK(src, 'storeWrite') then return { ok = false, error = 'rate_limited' } end
     local entry = EnsurePhone(src)
     if not entry then return { ok = false, error = 'no_character' } end
@@ -319,7 +319,7 @@ PhoneCallback('cipher-phone:store:uninstall', function(src, data)
     return { ok = true, data = { installed = entry.installedApps } }
 end)
 
-PhoneCallback('cipher-phone:saveSettings', function(src, incoming)
+PhoneCallback('XS-Phone:saveSettings', function(src, incoming)
     if type(incoming) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'saveSettings') then return { ok = false, error = 'rate_limited' } end
 
@@ -346,7 +346,7 @@ PhoneCallback('cipher-phone:saveSettings', function(src, incoming)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:pin:verify', function(src, data)
+PhoneCallback('XS-Phone:pin:verify', function(src, data)
     if not RateOK(src, 'pinVerify') then return { ok = false, error = 'rate_limited' } end
     local phone = EnsurePhone(src)
     if not phone then return { ok = false, error = 'no_character' } end
@@ -359,7 +359,7 @@ PhoneCallback('cipher-phone:pin:verify', function(src, data)
     return { ok = true, valid = valid }
 end)
 
-PhoneCallback('cipher-phone:pin:set', function(src, data)
+PhoneCallback('XS-Phone:pin:set', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'pinSet') then return { ok = false, error = 'rate_limited' } end
     local phone = EnsurePhone(src)
@@ -392,7 +392,7 @@ end
 if Config.Phone.Item.enabled then
     CreateThread(function()
         Framework.CreateUseableItem(Config.Phone.Item.name, function(src)
-            TriggerClientEvent('cipher-phone:client:use', itemSource(src))
+            TriggerClientEvent('XS-Phone:client:use', itemSource(src))
         end)
     end)
 end
@@ -405,7 +405,7 @@ exports('Notify', function(target, data)
     local src = type(target) == 'string' and GetSourceByNumber(target) or target
     if type(src) ~= 'number' or not bySrc[src] then return false end
     if type(data) ~= 'table' then return false end
-    TriggerClientEvent('cipher-phone:client:pushNotify', src, {
+    TriggerClientEvent('XS-Phone:client:pushNotify', src, {
         app = tostring(data.app or 'settings'),
         title = tostring(data.title or 'Notification'):sub(1, 60),
         body = tostring(data.body or ''):sub(1, 200),

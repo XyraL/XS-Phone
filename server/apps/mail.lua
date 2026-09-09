@@ -28,13 +28,13 @@ local function notifyAddress(address, fromAddr, subject)
     if not acct or not acct.number then return end
     local tgt = GetSourceByNumber(acct.number)
     if tgt then
-        TriggerClientEvent('cipher-phone:client:pushNotify', tgt, {
+        TriggerClientEvent('XS-Phone:client:pushNotify', tgt, {
             app = 'mail', title = fromAddr, body = subject,
         })
     end
 end
 
-PhoneCallback('cipher-phone:mail:me', function(src)
+PhoneCallback('XS-Phone:mail:me', function(src)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     AwaitDB()
@@ -43,7 +43,7 @@ PhoneCallback('cipher-phone:mail:me', function(src)
         or { address = nil, domain = Config.Phone.Mail.domain } }
 end)
 
-PhoneCallback('cipher-phone:mail:signup', function(src, data)
+PhoneCallback('XS-Phone:mail:signup', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'accountAuth') then return { ok = false, error = 'rate_limited' } end
 
@@ -72,7 +72,7 @@ PhoneCallback('cipher-phone:mail:signup', function(src, data)
     return { ok = true, data = { address = address } }
 end)
 
-PhoneCallback('cipher-phone:mail:login', function(src, data)
+PhoneCallback('XS-Phone:mail:login', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'accountAuth') then return { ok = false, error = 'rate_limited' } end
 
@@ -93,7 +93,7 @@ PhoneCallback('cipher-phone:mail:login', function(src, data)
     return { ok = true, data = { address = address } }
 end)
 
-PhoneCallback('cipher-phone:mail:logout', function(src)
+PhoneCallback('XS-Phone:mail:logout', function(src)
     if not RateOK(src, 'accountAuth') then return { ok = false, error = 'rate_limited' } end
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
@@ -101,7 +101,7 @@ PhoneCallback('cipher-phone:mail:logout', function(src)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:mail:list', function(src, data)
+PhoneCallback('XS-Phone:mail:list', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     local acct = GetMailAccount(me)
@@ -119,7 +119,7 @@ PhoneCallback('cipher-phone:mail:list', function(src, data)
     return { ok = true, data = rows }
 end)
 
-PhoneCallback('cipher-phone:mail:send', function(src, data)
+PhoneCallback('XS-Phone:mail:send', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'mailSend') then return { ok = false, error = 'rate_limited' } end
 
@@ -150,7 +150,7 @@ PhoneCallback('cipher-phone:mail:send', function(src, data)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:mail:read', function(src, data)
+PhoneCallback('XS-Phone:mail:read', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     local acct = GetMailAccount(me)
@@ -161,7 +161,7 @@ PhoneCallback('cipher-phone:mail:read', function(src, data)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:mail:delete', function(src, data)
+PhoneCallback('XS-Phone:mail:delete', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     local acct = GetMailAccount(me)

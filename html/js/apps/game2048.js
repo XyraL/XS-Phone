@@ -4,8 +4,8 @@
 
     function bestScore(set) {
         try {
-            if (set !== undefined) localStorage.setItem('cipher2048', String(set));
-            return Number(localStorage.getItem('cipher2048')) || 0;
+            if (set !== undefined) localStorage.setItem('xs2048', String(set));
+            return Number(localStorage.getItem('xs2048')) || 0;
         } catch (e) { return 0; }
     }
 

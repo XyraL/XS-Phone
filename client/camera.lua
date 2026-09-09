@@ -70,7 +70,7 @@ RegisterNUICallback('cameraCapture', function(_, cb)
         return
     end
     if apiKey == '' and Config.Phone.Media.provider ~= 'custom' then
-        print('^1[cipher-phone]^0 Config.Phone.Media.apiKey is empty — add your fivemanage API key')
+        print('^1[XS-Phone]^0 Config.Phone.Media.apiKey is empty — add your fivemanage API key')
         cb({ ok = false, error = 'not_configured' })
         return
     end
@@ -112,7 +112,7 @@ RegisterNUICallback('cameraCapture', function(_, cb)
             if url then
                 finish({ ok = true, url = url })
             else
-                print('^1[cipher-phone]^0 upload failed — provider answered: ' .. tostring(data):sub(1, 200))
+                print('^1[XS-Phone]^0 upload failed — provider answered: ' .. tostring(data):sub(1, 200))
                 finish({ ok = false, error = 'upload_failed' })
             end
         end)

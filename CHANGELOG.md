@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to **Cipher — Phone**.
+All notable changes to **XS-Phone**.
 
 ## [1.0.2] — 2026-09-06
 

@@ -13,7 +13,7 @@ if not IsDuplicityVersion() then
             end)
         end
     else
-        print('^1[cipher-phone]^0 RegisterNUICallback unavailable when the bridge loaded — NUI wrapper skipped.')
+        print('^1[XS-Phone]^0 RegisterNUICallback unavailable when the bridge loaded — NUI wrapper skipped.')
     end
 end
 
@@ -25,7 +25,7 @@ elseif GetResourceState('qb-core') == 'started' then
     Framework.name = 'qbcore'
     Framework.core = exports['qb-core']:GetCoreObject()
 else
-    print('^1[cipher-phone]^0 No supported framework found. Start qbx_core or qb-core before cipher-phone.')
+    print('^1[XS-Phone]^0 No supported framework found. Start qbx_core or qb-core before XS-Phone.')
 end
 
 local IS_SERVER = IsDuplicityVersion()
@@ -107,13 +107,13 @@ if IS_SERVER then
     function Framework.AddMoney(src, account, amount, reason)
         local player = Framework.GetPlayer(src)
         if not player then return false end
-        return player.Functions.AddMoney(account, amount, reason or 'cipher-phone')
+        return player.Functions.AddMoney(account, amount, reason or 'XS-Phone')
     end
 
     function Framework.RemoveMoney(src, account, amount, reason)
         local player = Framework.GetPlayer(src)
         if not player then return false end
-        return player.Functions.RemoveMoney(account, amount, reason or 'cipher-phone')
+        return player.Functions.RemoveMoney(account, amount, reason or 'XS-Phone')
     end
 
     function Framework.GetMoney(src, account)
@@ -152,6 +152,6 @@ else
 end
 
 if Config and Config.Debug then
-    print(('^2[cipher-phone]^0 bridge loaded (%s) on %s'):format(
+    print(('^2[XS-Phone]^0 bridge loaded (%s) on %s'):format(
         Framework.name or 'none', IS_SERVER and 'server' or 'client'))
 end

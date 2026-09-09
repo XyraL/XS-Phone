@@ -37,13 +37,13 @@ local function notifyAuthor(postId, exceptNumber, body)
     if not author or author == exceptNumber then return end
     local tgt = GetSourceByNumber(author)
     if tgt then
-        TriggerClientEvent('cipher-phone:client:pushNotify', tgt, {
+        TriggerClientEvent('XS-Phone:client:pushNotify', tgt, {
             app = 'prism', title = Config.Phone.AppNames.prism, body = body,
         })
     end
 end
 
-PhoneCallback('cipher-phone:prism:feed', function(src, data)
+PhoneCallback('XS-Phone:prism:feed', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
 
@@ -59,7 +59,7 @@ PhoneCallback('cipher-phone:prism:feed', function(src, data)
         '(? IS NULL OR p.id < ?)', { me, me, before, before }) }
 end)
 
-PhoneCallback('cipher-phone:prism:post', function(src, data)
+PhoneCallback('XS-Phone:prism:post', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'prismPost') then return { ok = false, error = 'rate_limited' } end
 
@@ -78,7 +78,7 @@ PhoneCallback('cipher-phone:prism:post', function(src, data)
     return { ok = true, data = { id = id } }
 end)
 
-PhoneCallback('cipher-phone:prism:like', function(src, data)
+PhoneCallback('XS-Phone:prism:like', function(src, data)
     if not RateOK(src, 'prismWrite') then return { ok = false, error = 'rate_limited' } end
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
@@ -103,7 +103,7 @@ PhoneCallback('cipher-phone:prism:like', function(src, data)
     return { ok = true, liked = true }
 end)
 
-PhoneCallback('cipher-phone:prism:comments', function(src, data)
+PhoneCallback('XS-Phone:prism:comments', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     local postId = tonumber(data and data.postId) or 0
@@ -121,7 +121,7 @@ PhoneCallback('cipher-phone:prism:comments', function(src, data)
     return { ok = true, data = rows }
 end)
 
-PhoneCallback('cipher-phone:prism:comment', function(src, data)
+PhoneCallback('XS-Phone:prism:comment', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'prismWrite') then return { ok = false, error = 'rate_limited' } end
 
@@ -145,7 +145,7 @@ PhoneCallback('cipher-phone:prism:comment', function(src, data)
         display = profile.display, avatar = profile.avatar, mine = true, at = os.time() * 1000 } }
 end)
 
-PhoneCallback('cipher-phone:prism:delete', function(src, data)
+PhoneCallback('XS-Phone:prism:delete', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     local postId = tonumber(data and data.postId) or 0
@@ -158,7 +158,7 @@ PhoneCallback('cipher-phone:prism:delete', function(src, data)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:prism:profile', function(src, data)
+PhoneCallback('XS-Phone:prism:profile', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
 

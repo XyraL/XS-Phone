@@ -2,7 +2,7 @@ local function expiryCutoff()
     return os.time() - (Config.Phone.Market.expiryDays or 14) * 86400
 end
 
-PhoneCallback('cipher-phone:market:list', function(src)
+PhoneCallback('XS-Phone:market:list', function(src)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
 
@@ -20,7 +20,7 @@ PhoneCallback('cipher-phone:market:list', function(src)
     return { ok = true, data = rows }
 end)
 
-PhoneCallback('cipher-phone:market:post', function(src, data)
+PhoneCallback('XS-Phone:market:post', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'marketPost') then return { ok = false, error = 'rate_limited' } end
 
@@ -52,7 +52,7 @@ PhoneCallback('cipher-phone:market:post', function(src, data)
     return { ok = true, data = { id = id } }
 end)
 
-PhoneCallback('cipher-phone:market:delete', function(src, data)
+PhoneCallback('XS-Phone:market:delete', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     MySQL.update.await('DELETE FROM phone_market WHERE id = ? AND seller_number = ?',

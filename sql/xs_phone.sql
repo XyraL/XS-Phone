@@ -1,4 +1,4 @@
--- cipher-phone schema
+-- XS-Phone schema
 -- The resource also creates all of this automatically on first start
 -- (server/db.lua), so importing this file manually is optional — it exists
 -- for server owners who prefer to manage schema themselves.

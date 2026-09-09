@@ -11,7 +11,7 @@ local function modelOf(row)
     return nil, hash
 end
 
-PhoneCallback('cipher-phone:garage:list', function(src)
+PhoneCallback('XS-Phone:garage:list', function(src)
     if not Config.Phone.Garage.enabled then return { ok = false, error = 'disabled' } end
 
     local citizenid = Framework.GetCitizenId(src)
@@ -64,7 +64,7 @@ end
 
 local pendingValet = {}
 
-PhoneCallback('cipher-phone:garage:ping', function(src, data)
+PhoneCallback('XS-Phone:garage:ping', function(src, data)
     if not Config.Phone.Garage.Ping.enabled then return { ok = false, error = 'disabled' } end
     if not RateOK(src, 'garagePing') then return { ok = false, error = 'rate_limited' } end
 
@@ -85,7 +85,7 @@ PhoneCallback('cipher-phone:garage:ping', function(src, data)
     return { ok = false, error = 'not_found' }
 end)
 
-PhoneCallback('cipher-phone:garage:valet', function(src, data)
+PhoneCallback('XS-Phone:garage:valet', function(src, data)
     local valet = Config.Phone.Garage.Valet
     if not valet.enabled then return { ok = false, error = 'disabled' } end
     if not RateOK(src, 'valet') then return { ok = false, error = 'rate_limited' } end
@@ -117,12 +117,12 @@ PhoneCallback('cipher-phone:garage:valet', function(src, data)
 
     SetTimeout((valet.delay or 12) * 1000, function()
         if GetPlayerPed(src) == 0 then return end
-        TriggerClientEvent('cipher-phone:client:valetSpawn', src, {
+        TriggerClientEvent('XS-Phone:client:valetSpawn', src, {
             model = name or hash,
             plate = row.plate,
             mods = row.mods,
         })
-        TriggerClientEvent('cipher-phone:client:pushNotify', src, {
+        TriggerClientEvent('XS-Phone:client:pushNotify', src, {
             app = 'garage', title = 'Valet',
             body = 'Your car has arrived outside.',
         })
@@ -131,11 +131,11 @@ PhoneCallback('cipher-phone:garage:valet', function(src, data)
     return { ok = true, data = { cost = cost, delay = valet.delay or 12 } }
 end)
 
-RegisterNetEvent('cipher-phone:valetOk', function()
+RegisterNetEvent('XS-Phone:valetOk', function()
     pendingValet[source] = nil
 end)
 
-RegisterNetEvent('cipher-phone:valetFailed', function()
+RegisterNetEvent('XS-Phone:valetFailed', function()
     local src = source
     local pending = pendingValet[src]
     pendingValet[src] = nil

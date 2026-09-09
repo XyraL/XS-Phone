@@ -58,7 +58,7 @@ body.dev {
 .wp-sunset   { background: linear-gradient(165deg, #1a0533 0%, #6f1d46 45%, #c94b4b 80%, #f2994a 100%); }
 .wp-ocean    { background: linear-gradient(170deg, #000428 0%, #004e92 100%); }
 .wp-graphite { background: linear-gradient(160deg, #16161a 0%, #2b2b31 55%, #3a3a42 100%); }
-.wp-cipher   { background: linear-gradient(160deg, #10151a 0%, #14343a 45%, #0f6b6b 75%, #d98e2b 130%); }
+.wp-xyral    { background: linear-gradient(160deg, #10151a 0%, #14343a 45%, #0f6b6b 75%, #d98e2b 130%); }
 .wp-midnight { background: linear-gradient(170deg, #05060f 0%, #0b1030 60%, #1b2560 100%); }
 .wp-rose     { background: linear-gradient(160deg, #2b0a1a 0%, #7a1f4d 55%, #ff5e8a 110%); }
 .wp-emerald  { background: linear-gradient(160deg, #04120c 0%, #0c3a26 55%, #1f8a5a 110%); }

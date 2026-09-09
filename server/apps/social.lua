@@ -68,19 +68,19 @@ local function notifyAuthor(postId, exceptNumber, title, body)
     if not author or author == exceptNumber then return end
     local tgt = GetSourceByNumber(author)
     if tgt then
-        TriggerClientEvent('cipher-phone:client:pushNotify', tgt, {
+        TriggerClientEvent('XS-Phone:client:pushNotify', tgt, {
             app = 'social', title = title, body = body,
         })
     end
 end
 
-PhoneCallback('cipher-phone:social:me', function(src)
+PhoneCallback('XS-Phone:social:me', function(src)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     return { ok = true, data = publicProfile(myProfile(me)) }
 end)
 
-PhoneCallback('cipher-phone:social:createProfile', function(src, data)
+PhoneCallback('XS-Phone:social:createProfile', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'socialWrite') then return { ok = false, error = 'rate_limited' } end
 
@@ -106,7 +106,7 @@ PhoneCallback('cipher-phone:social:createProfile', function(src, data)
     return { ok = true, data = { handle = handle, display = display, bio = bio, verified = false } }
 end)
 
-PhoneCallback('cipher-phone:social:login', function(src, data)
+PhoneCallback('XS-Phone:social:login', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'accountAuth') then return { ok = false, error = 'rate_limited' } end
 
@@ -128,7 +128,7 @@ PhoneCallback('cipher-phone:social:login', function(src, data)
     return { ok = true, data = publicProfile(myProfile(me)) }
 end)
 
-PhoneCallback('cipher-phone:social:logout', function(src)
+PhoneCallback('XS-Phone:social:logout', function(src)
     if not RateOK(src, 'accountAuth') then return { ok = false, error = 'rate_limited' } end
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
@@ -137,7 +137,7 @@ PhoneCallback('cipher-phone:social:logout', function(src)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:social:updateProfile', function(src, data)
+PhoneCallback('XS-Phone:social:updateProfile', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'socialWrite') then return { ok = false, error = 'rate_limited' } end
 
@@ -165,7 +165,7 @@ PhoneCallback('cipher-phone:social:updateProfile', function(src, data)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:social:feed', function(src, data)
+PhoneCallback('XS-Phone:social:feed', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
 
@@ -185,7 +185,7 @@ PhoneCallback('cipher-phone:social:feed', function(src, data)
         { me, me, before, before }) }
 end)
 
-PhoneCallback('cipher-phone:social:post', function(src, data)
+PhoneCallback('XS-Phone:social:post', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'socialPost') then return { ok = false, error = 'rate_limited' } end
 
@@ -221,7 +221,7 @@ PhoneCallback('cipher-phone:social:post', function(src, data)
     return { ok = true, data = { id = id } }
 end)
 
-PhoneCallback('cipher-phone:social:like', function(src, data)
+PhoneCallback('XS-Phone:social:like', function(src, data)
     if not RateOK(src, 'socialWrite') then return { ok = false, error = 'rate_limited' } end
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
@@ -247,7 +247,7 @@ PhoneCallback('cipher-phone:social:like', function(src, data)
     return { ok = true, liked = true }
 end)
 
-PhoneCallback('cipher-phone:social:delete', function(src, data)
+PhoneCallback('XS-Phone:social:delete', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     local postId = tonumber(data and data.postId) or 0
@@ -257,7 +257,7 @@ PhoneCallback('cipher-phone:social:delete', function(src, data)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:social:thread', function(src, data)
+PhoneCallback('XS-Phone:social:thread', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     local postId = tonumber(data and data.postId) or 0
@@ -271,7 +271,7 @@ PhoneCallback('cipher-phone:social:thread', function(src, data)
     return { ok = true, data = { post = root, replies = flipped } }
 end)
 
-PhoneCallback('cipher-phone:social:profile', function(src, data)
+PhoneCallback('XS-Phone:social:profile', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
 
@@ -305,7 +305,7 @@ PhoneCallback('cipher-phone:social:profile', function(src, data)
     return { ok = true, data = { profile = profile, posts = posts } }
 end)
 
-PhoneCallback('cipher-phone:social:follow', function(src, data)
+PhoneCallback('XS-Phone:social:follow', function(src, data)
     if not RateOK(src, 'socialWrite') then return { ok = false, error = 'rate_limited' } end
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
@@ -329,7 +329,7 @@ PhoneCallback('cipher-phone:social:follow', function(src, data)
         'INSERT INTO phone_social_follows (follower, followed) VALUES (?, ?)', { me, target })
     local tgt = GetSourceByNumber(target)
     if tgt then
-        TriggerClientEvent('cipher-phone:client:pushNotify', tgt, {
+        TriggerClientEvent('XS-Phone:client:pushNotify', tgt, {
             app = 'social', title = Config.Phone.AppNames.social,
             body = ('@%s followed you'):format(profile.handle),
         })

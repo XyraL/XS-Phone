@@ -4,8 +4,8 @@
 
     function bestScore(set) {
         try {
-            if (set !== undefined) localStorage.setItem('cipherViper', String(set));
-            return Number(localStorage.getItem('cipherViper')) || 0;
+            if (set !== undefined) localStorage.setItem('xsViper', String(set));
+            return Number(localStorage.getItem('xsViper')) || 0;
         } catch (e) { return 0; }
     }
 

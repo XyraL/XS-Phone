@@ -55,7 +55,7 @@ Config.Phone = {
 
     -- Name shown on the boot screen.
     Branding = {
-        osName = 'CipherOS',
+        osName = 'XyraLOS',
     },
 
     -- Share your number with people standing near you. They only get your

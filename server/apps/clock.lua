@@ -1,4 +1,4 @@
-PhoneCallback('cipher-phone:alarms:list', function(src)
+PhoneCallback('XS-Phone:alarms:list', function(src)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     local rows = MySQL.query.await(
@@ -7,7 +7,7 @@ PhoneCallback('cipher-phone:alarms:list', function(src)
     return { ok = true, data = rows }
 end)
 
-PhoneCallback('cipher-phone:alarms:save', function(src, data)
+PhoneCallback('XS-Phone:alarms:save', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'alarmsWrite') then return { ok = false, error = 'rate_limited' } end
 
@@ -30,7 +30,7 @@ PhoneCallback('cipher-phone:alarms:save', function(src, data)
     return { ok = true, data = { id = id } }
 end)
 
-PhoneCallback('cipher-phone:alarms:toggle', function(src, data)
+PhoneCallback('XS-Phone:alarms:toggle', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     MySQL.update.await(
@@ -39,7 +39,7 @@ PhoneCallback('cipher-phone:alarms:toggle', function(src, data)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:alarms:delete', function(src, data)
+PhoneCallback('XS-Phone:alarms:delete', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     MySQL.update.await('DELETE FROM phone_alarms WHERE id = ? AND owner_number = ?',
@@ -61,7 +61,7 @@ CreateThread(function()
                 for _, r in ipairs(rows or {}) do
                     local src = GetSourceByNumber(r.owner_number)
                     if src then
-                        TriggerClientEvent('cipher-phone:client:pushNotify', src, {
+                        TriggerClientEvent('XS-Phone:client:pushNotify', src, {
                             app = 'clock', title = 'Alarm — ' .. minute,
                             body = r.label or 'Alarm',
                         })

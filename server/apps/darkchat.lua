@@ -35,7 +35,7 @@ local function cleanAlias(input)
     return alias
 end
 
-PhoneCallback('cipher-phone:darkchat:rooms', function(src)
+PhoneCallback('XS-Phone:darkchat:rooms', function(src)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     local rows = MySQL.query.await([[
@@ -49,7 +49,7 @@ PhoneCallback('cipher-phone:darkchat:rooms', function(src)
     return { ok = true, data = rows }
 end)
 
-PhoneCallback('cipher-phone:darkchat:create', function(src, data)
+PhoneCallback('XS-Phone:darkchat:create', function(src, data)
     if not RateOK(src, 'darkchatRoom') then return { ok = false, error = 'rate_limited' } end
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
@@ -68,7 +68,7 @@ PhoneCallback('cipher-phone:darkchat:create', function(src, data)
     return { ok = true, data = { id = roomId, code = code, name = name, handle = alias } }
 end)
 
-PhoneCallback('cipher-phone:darkchat:join', function(src, data)
+PhoneCallback('XS-Phone:darkchat:join', function(src, data)
     if not RateOK(src, 'darkchatRoom') then return { ok = false, error = 'rate_limited' } end
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
@@ -88,7 +88,7 @@ PhoneCallback('cipher-phone:darkchat:join', function(src, data)
     return { ok = true, data = { id = room.id, code = room.code, name = room.name, handle = alias } }
 end)
 
-PhoneCallback('cipher-phone:darkchat:messages', function(src, data)
+PhoneCallback('XS-Phone:darkchat:messages', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     local roomId = tonumber(data and data.roomId) or 0
@@ -105,7 +105,7 @@ PhoneCallback('cipher-phone:darkchat:messages', function(src, data)
     return { ok = true, data = { messages = flipped, myHandle = mine.handle } }
 end)
 
-PhoneCallback('cipher-phone:darkchat:send', function(src, data)
+PhoneCallback('XS-Phone:darkchat:send', function(src, data)
     if not RateOK(src, 'darkchatSend') then return { ok = false, error = 'rate_limited' } end
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
@@ -139,14 +139,14 @@ PhoneCallback('cipher-phone:darkchat:send', function(src, data)
     for _, m in ipairs(members) do
         local tgt = GetSourceByNumber(m.number)
         if tgt then
-            TriggerClientEvent('cipher-phone:client:darkchat', tgt, { roomId = roomId, message = message })
+            TriggerClientEvent('XS-Phone:client:darkchat', tgt, { roomId = roomId, message = message })
         end
     end
 
     return { ok = true, data = message }
 end)
 
-PhoneCallback('cipher-phone:darkchat:leave', function(src, data)
+PhoneCallback('XS-Phone:darkchat:leave', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     local roomId = tonumber(data and data.roomId) or 0

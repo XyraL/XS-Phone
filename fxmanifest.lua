@@ -2,9 +2,9 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-name 'cipher-phone'
+name 'XS-Phone'
 author 'XyraL'
-description 'Cipher — Phone. iPhone-style smartphone for QBox/QBCore.'
+description 'iPhone-style smartphone for QBox/QBCore.'
 version '1.0.2'
 
 dependencies {

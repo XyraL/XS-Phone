@@ -6,12 +6,12 @@ local PAGE_SIZE = 50
 local function pushTo(number, payload)
     local tgt = GetSourceByNumber(number)
     if not tgt then
-        if Config.Debug then print(('^3[cipher-phone]^0 text to %s not pushed: offline'):format(number)) end
+        if Config.Debug then print(('^3[XS-Phone]^0 text to %s not pushed: offline'):format(number)) end
         return
     end
     local settings = GetSettingsByNumber(number)
     if settings and settings.airplane then
-        if Config.Debug then print(('^3[cipher-phone]^0 text to %s not pushed: airplane mode'):format(number)) end
+        if Config.Debug then print(('^3[XS-Phone]^0 text to %s not pushed: airplane mode'):format(number)) end
         return
     end
     local sender = payload.message and payload.message.sender
@@ -20,7 +20,7 @@ local function pushTo(number, payload)
             'SELECT name FROM phone_contacts WHERE owner_number = ? AND saved_number = ?',
             { number, sender }) or sender
     end
-    TriggerClientEvent('cipher-phone:client:newMessage', tgt, payload)
+    TriggerClientEvent('XS-Phone:client:newMessage', tgt, payload)
 end
 
 local function isMember(threadId, number)
@@ -67,9 +67,9 @@ local function deliver(threadId, sender, body, mediaUrl)
         { threadId, sender })
     for _, m in ipairs(others) do
         if DbBool(m.muted) then
-            if Config.Debug then print(('^3[cipher-phone]^0 text to %s not pushed: thread muted (muted=%s)'):format(m.number, tostring(m.muted))) end
+            if Config.Debug then print(('^3[XS-Phone]^0 text to %s not pushed: thread muted (muted=%s)'):format(m.number, tostring(m.muted))) end
         elseif IsBlockedBy(m.number, sender) then
-            if Config.Debug then print(('^3[cipher-phone]^0 text to %s not pushed: sender %s blocked'):format(m.number, sender)) end
+            if Config.Debug then print(('^3[XS-Phone]^0 text to %s not pushed: sender %s blocked'):format(m.number, sender)) end
         else
             pushTo(m.number, { threadId = threadId, message = message })
         end
@@ -77,7 +77,7 @@ local function deliver(threadId, sender, body, mediaUrl)
     return message
 end
 
-PhoneCallback('cipher-phone:messages:threads', function(src)
+PhoneCallback('XS-Phone:messages:threads', function(src)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
 
@@ -104,7 +104,7 @@ PhoneCallback('cipher-phone:messages:threads', function(src)
     return { ok = true, data = rows, me = me }
 end)
 
-PhoneCallback('cipher-phone:messages:getThread', function(src, data)
+PhoneCallback('XS-Phone:messages:getThread', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     local threadId = tonumber(data and data.threadId)
@@ -135,7 +135,7 @@ PhoneCallback('cipher-phone:messages:getThread', function(src, data)
     return { ok = true, data = { messages = messages, hasMore = hasMore } }
 end)
 
-PhoneCallback('cipher-phone:messages:markRead', function(src, data)
+PhoneCallback('XS-Phone:messages:markRead', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     local threadId = tonumber(data and data.threadId)
@@ -149,7 +149,7 @@ PhoneCallback('cipher-phone:messages:markRead', function(src, data)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:messages:send', function(src, data)
+PhoneCallback('XS-Phone:messages:send', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'sendMessage') then return { ok = false, error = 'rate_limited' } end
 
@@ -187,7 +187,7 @@ PhoneCallback('cipher-phone:messages:send', function(src, data)
     return { ok = true, data = message }
 end)
 
-PhoneCallback('cipher-phone:messages:createGroup', function(src, data)
+PhoneCallback('XS-Phone:messages:createGroup', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'threadWrite') then return { ok = false, error = 'rate_limited' } end
 
@@ -217,7 +217,7 @@ PhoneCallback('cipher-phone:messages:createGroup', function(src, data)
         if n ~= me then
             local tgt = GetSourceByNumber(n)
             if tgt then
-                TriggerClientEvent('cipher-phone:client:pushNotify', tgt, {
+                TriggerClientEvent('XS-Phone:client:pushNotify', tgt, {
                     app = 'messages', title = name, body = 'You were added to a group.',
                 })
             end
@@ -226,7 +226,7 @@ PhoneCallback('cipher-phone:messages:createGroup', function(src, data)
     return { ok = true, data = { threadId = threadId } }
 end)
 
-PhoneCallback('cipher-phone:messages:toggleMute', function(src, data)
+PhoneCallback('XS-Phone:messages:toggleMute', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     MySQL.update.await(
@@ -235,7 +235,7 @@ PhoneCallback('cipher-phone:messages:toggleMute', function(src, data)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:messages:leave', function(src, data)
+PhoneCallback('XS-Phone:messages:leave', function(src, data)
     if not RateOK(src, 'threadWrite') then return { ok = false, error = 'rate_limited' } end
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end

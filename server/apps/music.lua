@@ -1,4 +1,4 @@
-PhoneCallback('cipher-phone:music:list', function(src)
+PhoneCallback('XS-Phone:music:list', function(src)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     local rows = MySQL.query.await(
@@ -7,7 +7,7 @@ PhoneCallback('cipher-phone:music:list', function(src)
     return { ok = true, data = rows }
 end)
 
-PhoneCallback('cipher-phone:music:add', function(src, data)
+PhoneCallback('XS-Phone:music:add', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'musicWrite') then return { ok = false, error = 'rate_limited' } end
 
@@ -33,7 +33,7 @@ PhoneCallback('cipher-phone:music:add', function(src, data)
     return { ok = true, data = { id = id, title = title, url = url } }
 end)
 
-PhoneCallback('cipher-phone:music:delete', function(src, data)
+PhoneCallback('XS-Phone:music:delete', function(src, data)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     MySQL.update.await('DELETE FROM phone_music WHERE id = ? AND owner_number = ?',

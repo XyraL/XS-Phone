@@ -10,7 +10,7 @@ local function distanceBetween(a, b)
     return #(GetEntityCoords(pedA) - GetEntityCoords(pedB))
 end
 
-PhoneCallback('cipher-phone:drop:scan', function(src, data)
+PhoneCallback('XS-Phone:drop:scan', function(src, data)
     if not Config.Phone.Drop.enabled then return { ok = false, error = 'disabled' } end
     if type(data) ~= 'table' or type(data.ids) ~= 'table' then
         return { ok = false, error = 'bad_payload' }
@@ -38,7 +38,7 @@ PhoneCallback('cipher-phone:drop:scan', function(src, data)
     return { ok = true, data = out }
 end)
 
-PhoneCallback('cipher-phone:drop:send', function(src, data)
+PhoneCallback('XS-Phone:drop:send', function(src, data)
     if not Config.Phone.Drop.enabled then return { ok = false, error = 'disabled' } end
     if not RateOK(src, 'dropSend') then return { ok = false, error = 'rate_limited' } end
 
@@ -59,11 +59,11 @@ PhoneCallback('cipher-phone:drop:send', function(src, data)
         name = Framework.GetName(src) or 'Unknown',
         expires = os.time() + (Config.Phone.Drop.offerTimeout or 30),
     }
-    TriggerClientEvent('cipher-phone:client:dropOffer', target, { name = pending[target].name })
+    TriggerClientEvent('XS-Phone:client:dropOffer', target, { name = pending[target].name })
     return { ok = true }
 end)
 
-RegisterNetEvent('cipher-phone:drop:respond', function(accept)
+RegisterNetEvent('XS-Phone:drop:respond', function(accept)
     local src = source
     local offer = pending[src]
     pending[src] = nil
@@ -72,7 +72,7 @@ RegisterNetEvent('cipher-phone:drop:respond', function(accept)
     local sender = offer.from
     if not accept then
         if GetPlayerPed(sender) ~= 0 then
-            TriggerClientEvent('cipher-phone:client:pushNotify', sender, {
+            TriggerClientEvent('XS-Phone:client:pushNotify', sender, {
                 app = 'contacts', title = 'Drop', body = 'Your card was declined.',
             })
         end
@@ -86,14 +86,14 @@ RegisterNetEvent('cipher-phone:drop:respond', function(accept)
         'INSERT INTO phone_contacts (owner_number, saved_number, name) VALUES (?, ?, ?)',
         { me.number, offer.number, offer.name })
 
-    TriggerClientEvent('cipher-phone:client:pushNotify', src, {
+    TriggerClientEvent('XS-Phone:client:pushNotify', src, {
         app = 'contacts', title = 'Contact added',
         body = ('%s · %s'):format(offer.name, offer.number),
     })
-    TriggerClientEvent('cipher-phone:client:contactsChanged', src)
+    TriggerClientEvent('XS-Phone:client:contactsChanged', src)
 
     if GetPlayerPed(sender) ~= 0 then
-        TriggerClientEvent('cipher-phone:client:pushNotify', sender, {
+        TriggerClientEvent('XS-Phone:client:pushNotify', sender, {
             app = 'contacts', title = 'Drop',
             body = ('%s saved your card.'):format(Framework.GetName(src) or 'Someone'),
         })

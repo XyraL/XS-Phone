@@ -55,7 +55,7 @@ function AwaitServer(name, ...)
     local deadline = GetGameTimer() + 8000
     while not done and GetGameTimer() < deadline do Wait(25) end
     if not done then
-        print(('^1[cipher-phone]^0 no reply from %s — the server side of cipher-phone is not responding. Check the SERVER console for a startup error.'):format(name))
+        print(('^1[XS-Phone]^0 no reply from %s — the server side of XS-Phone is not responding. Check the SERVER console for a startup error.'):format(name))
         return nil
     end
     return result
@@ -71,7 +71,7 @@ local function canOpen()
     end
 
     if Config.Phone.Item.enabled then
-        local res = AwaitServer('cipher-phone:hasPhone')
+        local res = AwaitServer('XS-Phone:hasPhone')
         if res == nil then
             Framework.Notify('Phone server not responding — check the server console', 'error')
             return false
@@ -88,7 +88,7 @@ end
 function OpenPhone()
     if not canOpen() then return end
 
-    local res = AwaitServer('cipher-phone:getPhoneData')
+    local res = AwaitServer('XS-Phone:getPhoneData')
     if res == nil then
         Framework.Notify('Phone server not responding — check the server console', 'error')
         return
@@ -164,7 +164,7 @@ RegisterCommand(Config.Phone.Command, function()
 end, false)
 RegisterKeyMapping(Config.Phone.Command, 'Open phone', 'keyboard', Config.Phone.OpenKey)
 
-RegisterNetEvent('cipher-phone:client:use', function()
+RegisterNetEvent('XS-Phone:client:use', function()
     if phoneOpen then ClosePhone() else OpenPhone() end
 end)
 
@@ -172,7 +172,7 @@ local function quietMode()
     return ClientSettings ~= nil and ClientSettings.dnd == true
 end
 
-RegisterNetEvent('cipher-phone:client:newMessage', function(payload)
+RegisterNetEvent('XS-Phone:client:newMessage', function(payload)
     SendNUIMessage({ action = 'phone:newMessage', data = payload })
     if not phoneOpen and not quietMode() then
         local msg = payload.message or {}
@@ -187,28 +187,28 @@ RegisterNetEvent('cipher-phone:client:newMessage', function(payload)
     end
 end)
 
-RegisterNetEvent('cipher-phone:client:pushNotify', function(n)
+RegisterNetEvent('XS-Phone:client:pushNotify', function(n)
     SendNUIMessage({ action = 'phone:notify', data = n })
     if not phoneOpen and not quietMode() then
         Framework.Notify(n.body and (n.title .. ': ' .. n.body) or n.title, 'inform')
     end
 end)
 
-RegisterNetEvent('cipher-phone:client:darkchat', function(payload)
+RegisterNetEvent('XS-Phone:client:darkchat', function(payload)
     SendNUIMessage({ action = 'phone:darkchat', data = payload })
 end)
 
-RegisterNetEvent('cipher-phone:client:valetSpawn', function(data)
+RegisterNetEvent('XS-Phone:client:valetSpawn', function(data)
     local ped = PlayerPedId()
     local coords = GetEntityCoords(ped)
 
     local model = type(data.model) == 'number' and data.model or joaat(tostring(data.model))
     if not IsModelInCdimage(model) or not IsModelAVehicle(model) then
-        TriggerServerEvent('cipher-phone:valetFailed')
+        TriggerServerEvent('XS-Phone:valetFailed')
         return
     end
     if not pcall(lib.requestModel, model, 10000) then
-        TriggerServerEvent('cipher-phone:valetFailed')
+        TriggerServerEvent('XS-Phone:valetFailed')
         return
     end
 
@@ -227,10 +227,10 @@ RegisterNetEvent('cipher-phone:client:valetSpawn', function(data)
     local veh = CreateVehicle(model, spawnPos.x, spawnPos.y, spawnPos.z + 0.5, heading, true, false)
     SetModelAsNoLongerNeeded(model)
     if veh == 0 then
-        TriggerServerEvent('cipher-phone:valetFailed')
+        TriggerServerEvent('XS-Phone:valetFailed')
         return
     end
-    TriggerServerEvent('cipher-phone:valetOk')
+    TriggerServerEvent('XS-Phone:valetOk')
 
     SetVehicleNumberPlateText(veh, data.plate)
     SetVehicleOnGroundProperly(veh)

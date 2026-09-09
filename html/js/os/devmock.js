@@ -460,7 +460,7 @@
             const fresh = '555-0' + String(Math.floor(Math.random() * 900) + 100);
             return ok({
                 number: fresh, hasPin: mockPin !== null, settings: PhoneOS.state.settings,
-                os: 'CipherOS', appNames: { social: 'Chirp', darkchat: 'DarkChat', prism: 'Prism', match: 'Sparks', services: 'City' },
+                os: 'XyraLOS', appNames: { social: 'Chirp', darkchat: 'DarkChat', prism: 'Prism', match: 'Sparks', services: 'City' },
                 installedApps: [...db.installed], version: '0.12.0-dev', badges: {},
             });
         },

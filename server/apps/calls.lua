@@ -15,7 +15,7 @@ end
 
 local function pushState(src, payload)
     if GetPlayerPed(src) ~= 0 then
-        TriggerClientEvent('cipher-phone:client:callState', src, payload)
+        TriggerClientEvent('XS-Phone:client:callState', src, payload)
     end
 end
 
@@ -44,7 +44,7 @@ local function endCall(call, reason, loggedState)
     pushState(call.calleeSrc, payload)
 end
 
-PhoneCallback('cipher-phone:calls:start', function(src, data)
+PhoneCallback('XS-Phone:calls:start', function(src, data)
     if not RateOK(src, 'callStart') then return { ok = false, error = 'rate_limited' } end
 
     local me = EnsurePhone(src)
@@ -95,7 +95,7 @@ PhoneCallback('cipher-phone:calls:start', function(src, data)
 
     if calleeSettings and calleeSettings.dnd then
         logCall({ caller = me.number, callee = to, anonymous = anonymous }, 'missed', 0)
-        TriggerClientEvent('cipher-phone:client:pushNotify', calleeSrc, {
+        TriggerClientEvent('XS-Phone:client:pushNotify', calleeSrc, {
             app = 'phone', title = 'Missed call',
             body = anonymous and 'Anonymous' or me.number,
         })
@@ -124,7 +124,7 @@ PhoneCallback('cipher-phone:calls:start', function(src, data)
     SetTimeout((Config.Phone.Calls.timeout or 25) * 1000, function()
         local c = calls[call.id]
         if c and c.state == 'ringing' then
-            TriggerClientEvent('cipher-phone:client:pushNotify', c.calleeSrc, {
+            TriggerClientEvent('XS-Phone:client:pushNotify', c.calleeSrc, {
                 app = 'phone', title = 'Missed call',
                 body = c.anonymous and 'Anonymous' or c.caller,
             })
@@ -135,7 +135,7 @@ PhoneCallback('cipher-phone:calls:start', function(src, data)
     return { ok = true, data = { callId = call.id } }
 end)
 
-PhoneCallback('cipher-phone:calls:answer', function(src, data)
+PhoneCallback('XS-Phone:calls:answer', function(src, data)
     local call = calls[tonumber(data and data.callId) or 0]
     if not call or call.calleeSrc ~= src or call.state ~= 'ringing' then
         return { ok = false, error = 'no_call' }
@@ -155,7 +155,7 @@ PhoneCallback('cipher-phone:calls:answer', function(src, data)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:calls:decline', function(src, data)
+PhoneCallback('XS-Phone:calls:decline', function(src, data)
     local call = calls[tonumber(data and data.callId) or 0]
     if not call or call.calleeSrc ~= src or call.state ~= 'ringing' then
         return { ok = false, error = 'no_call' }
@@ -164,13 +164,13 @@ PhoneCallback('cipher-phone:calls:decline', function(src, data)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:calls:hangup', function(src, data)
+PhoneCallback('XS-Phone:calls:hangup', function(src, data)
     local call = calls[tonumber(data and data.callId) or 0]
     if not call or (call.callerSrc ~= src and call.calleeSrc ~= src) then
         return { ok = false, error = 'no_call' }
     end
     if call.state == 'ringing' then
-        TriggerClientEvent('cipher-phone:client:pushNotify', call.calleeSrc, {
+        TriggerClientEvent('XS-Phone:client:pushNotify', call.calleeSrc, {
             app = 'phone', title = 'Missed call',
             body = call.anonymous and 'Anonymous' or call.caller,
         })
@@ -181,7 +181,7 @@ PhoneCallback('cipher-phone:calls:hangup', function(src, data)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:calls:history', function(src)
+PhoneCallback('XS-Phone:calls:history', function(src)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
 

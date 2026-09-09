@@ -49,7 +49,7 @@ local function matchedWith(me, other)
         'SELECT 1 FROM phone_match_matches WHERE a = ? AND b = ?', { a, b }) ~= nil
 end
 
-PhoneCallback('cipher-phone:match:me', function(src)
+PhoneCallback('XS-Phone:match:me', function(src)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     local p = myProfile(me)
@@ -57,7 +57,7 @@ PhoneCallback('cipher-phone:match:me', function(src)
     return { ok = true, data = p }
 end)
 
-PhoneCallback('cipher-phone:match:saveProfile', function(src, data)
+PhoneCallback('XS-Phone:match:saveProfile', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'matchWrite') then return { ok = false, error = 'rate_limited' } end
 
@@ -113,7 +113,7 @@ PhoneCallback('cipher-phone:match:saveProfile', function(src, data)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:match:login', function(src, data)
+PhoneCallback('XS-Phone:match:login', function(src, data)
     if type(data) ~= 'table' then return { ok = false, error = 'bad_payload' } end
     if not RateOK(src, 'accountAuth') then return { ok = false, error = 'rate_limited' } end
 
@@ -137,7 +137,7 @@ PhoneCallback('cipher-phone:match:login', function(src, data)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:match:logout', function(src)
+PhoneCallback('XS-Phone:match:logout', function(src)
     if not RateOK(src, 'accountAuth') then return { ok = false, error = 'rate_limited' } end
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
@@ -148,7 +148,7 @@ PhoneCallback('cipher-phone:match:logout', function(src)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:match:deck', function(src)
+PhoneCallback('XS-Phone:match:deck', function(src)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
     if not myProfile(me) then return { ok = false, error = 'no_profile' } end
@@ -176,7 +176,7 @@ PhoneCallback('cipher-phone:match:deck', function(src)
     return { ok = true, data = deck }
 end)
 
-PhoneCallback('cipher-phone:match:swipe', function(src, data)
+PhoneCallback('XS-Phone:match:swipe', function(src, data)
     if not RateOK(src, 'matchSwipe') then return { ok = false, error = 'rate_limited' } end
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
@@ -206,7 +206,7 @@ PhoneCallback('cipher-phone:match:swipe', function(src, data)
         if super then
             local tgt = GetSourceByNumber(target)
             if tgt then
-                TriggerClientEvent('cipher-phone:client:pushNotify', tgt, {
+                TriggerClientEvent('XS-Phone:client:pushNotify', tgt, {
                     app = 'match', title = Config.Phone.AppNames.match,
                     body = 'Someone Super Liked you. Keep swiping to find them ⭐',
                 })
@@ -225,7 +225,7 @@ PhoneCallback('cipher-phone:match:swipe', function(src, data)
     local theirs = myProfile(target)
     local tgt = GetSourceByNumber(target)
     if tgt then
-        TriggerClientEvent('cipher-phone:client:pushNotify', tgt, {
+        TriggerClientEvent('XS-Phone:client:pushNotify', tgt, {
             app = 'match', title = Config.Phone.AppNames.match,
             body = ('It\'s a match — you and %s liked each other!'):format(mine and mine.name or 'someone'),
         })
@@ -237,7 +237,7 @@ PhoneCallback('cipher-phone:match:swipe', function(src, data)
     } }
 end)
 
-PhoneCallback('cipher-phone:match:unswipe', function(src)
+PhoneCallback('XS-Phone:match:unswipe', function(src)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
 
@@ -252,7 +252,7 @@ PhoneCallback('cipher-phone:match:unswipe', function(src)
     return { ok = true }
 end)
 
-PhoneCallback('cipher-phone:match:matches', function(src)
+PhoneCallback('XS-Phone:match:matches', function(src)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
 
@@ -278,7 +278,7 @@ PhoneCallback('cipher-phone:match:matches', function(src)
     return { ok = true, data = out }
 end)
 
-PhoneCallback('cipher-phone:match:unmatch', function(src, data)
+PhoneCallback('XS-Phone:match:unmatch', function(src, data)
     if not RateOK(src, 'matchWrite') then return { ok = false, error = 'rate_limited' } end
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
