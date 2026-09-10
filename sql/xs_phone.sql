@@ -267,30 +267,6 @@ CREATE TABLE IF NOT EXISTS `phone_music` (
     KEY `owner` (`owner_number`, `id`)
 );
 
-CREATE TABLE IF NOT EXISTS  (
-        VARCHAR(60) NOT NULL,
-       VARCHAR(64) NOT NULL,
-         VARCHAR(15) DEFAULT NULL,
-     TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (),
-    KEY  ()
-);
-
-CREATE TABLE IF NOT EXISTS  (
-                INT UNSIGNED NOT NULL AUTO_INCREMENT,
-     VARCHAR(60)  NOT NULL,
-            VARCHAR(6)   NOT NULL DEFAULT 'inbox',
-      VARCHAR(60)  NOT NULL,
-        VARCHAR(60)  NOT NULL,
-           VARCHAR(80)  NOT NULL,
-              TEXT         NOT NULL,
-         VARCHAR(255) DEFAULT NULL,
-           TINYINT(1)   NOT NULL DEFAULT 0,
-        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (),
-    KEY  (, , )
-);
-
 CREATE TABLE IF NOT EXISTS `phone_mail_accounts` (
     `address`    VARCHAR(60) NOT NULL,
     `password`   VARCHAR(64) NOT NULL,
@@ -313,4 +289,11 @@ CREATE TABLE IF NOT EXISTS `phone_emails` (
     `created_at`    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `owner` (`owner_address`, `folder`, `id`)
+);
+
+CREATE TABLE IF NOT EXISTS `phone_business_info` (
+    `job`          VARCHAR(60)  NOT NULL,
+    `announcement` VARCHAR(140) DEFAULT NULL,
+    `updated_at`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`job`)
 );
