@@ -207,7 +207,7 @@
             return ok({ threadId: t.id });
         },
         'drop:send': (d) => {
-            const names = { 3: 'Rosa Delgado', 8: 'Marcus Reed' };
+            const names = { 3: 'Rosa Delgado', 8: 'Isabel Ferreira' };
             setTimeout(() => PhoneOS.dispatch('phone:notify', {
                 app: 'contacts', title: 'Drop',
                 body: `${names[d.targetId] || 'They'} saved your card.`,
@@ -629,7 +629,7 @@
         if (name === 'dropScan') {
             return ok([
                 { id: 3, name: 'Rosa Delgado', dist: 2 },
-                { id: 8, name: 'Marcus Reed', dist: 7 },
+                { id: 8, name: 'Isabel Ferreira', dist: 7 },
             ]);
         }
         if (name === 'cameraCapture') {
@@ -644,9 +644,9 @@
         }
         if (name === 'dropRespond') {
             if (payload && payload.accept) {
-                db.contacts.push({ id: nextId++, number: '555-0850', name: 'Marcus Reed', favorite: 0, blocked: 0 });
+                db.contacts.push({ id: nextId++, number: '555-0850', name: 'Isabel Ferreira', favorite: 0, blocked: 0 });
                 PhoneOS.dispatch('phone:notify', {
-                    app: 'contacts', title: 'Contact added', body: 'Marcus Reed · 555-0850',
+                    app: 'contacts', title: 'Contact added', body: 'Isabel Ferreira · 555-0850',
                 });
                 PhoneOS.dispatch('phone:contactsChanged');
             }
@@ -666,7 +666,7 @@
         }, 8000);
 
         setTimeout(() => {
-            PhoneOS.dispatch('phone:dropOffer', { name: 'Marcus Reed' });
+            PhoneOS.dispatch('phone:dropOffer', { name: 'Isabel Ferreira' });
         }, 14000);
 
         setTimeout(() => {
