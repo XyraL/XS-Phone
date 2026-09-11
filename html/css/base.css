@@ -73,3 +73,16 @@ body.dev {
 
 #phone-screen.ts-small .app-view { zoom: 0.9; }
 #phone-screen.ts-large .app-view { zoom: 1.12; }
+
+/* Browser preview only: park the phone in the middle of the window instead of
+   the in-game bottom-right corner, so it is fully visible while working on it.
+   Margins (not a transform) do the centring, leaving transform for the fit
+   scale and the peek animation. */
+body.dev #phone-root {
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    margin-top: calc(var(--phone-h) / -2);
+    margin-left: calc(var(--phone-w) / -2);
+}

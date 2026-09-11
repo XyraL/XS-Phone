@@ -1,5 +1,6 @@
 PhoneOS.controlCenter = (() => {
     let el = null;
+    let scrim = null;
     let open = false;
 
     // Settings the panel can flip. Saving is debounced the same way the Settings
@@ -121,14 +122,35 @@ PhoneOS.controlCenter = (() => {
         bright.append(bIcon, range);
         panel.append(bright);
 
+        const handle = document.createElement('div');
+        handle.className = 'cc-handle';
+        panel.append(handle);
+
+        // Flick the panel up to put it away. Ignored when the gesture starts on
+        // a control, so dragging the brightness slider never closes the panel.
+        let sy = null;
+        panel.addEventListener('pointerdown', (e) => {
+            sy = e.target.closest('button, input') ? null : e.clientY;
+        });
+        panel.addEventListener('pointerup', (e) => {
+            if (sy === null) return;
+            const dy = e.clientY - sy;
+            sy = null;
+            if (dy < -36) hide();
+        });
+
         return panel;
     }
 
     function show() {
         if (open || !PhoneOS.state) return;
         hideOthers();
+        scrim = document.createElement('div');
+        scrim.className = 'cc-scrim';
+        scrim.addEventListener('click', hide);
         el = build();
-        document.getElementById('phone-screen').append(el);
+        const screen = document.getElementById('phone-screen');
+        screen.append(scrim, el);
         void el.offsetWidth;
         el.classList.add('in');
         open = true;
@@ -139,7 +161,10 @@ PhoneOS.controlCenter = (() => {
         open = false;
         el.classList.remove('in');
         const dead = el;
+        const deadScrim = scrim;
         el = null;
+        scrim = null;
+        if (deadScrim) deadScrim.remove();
         setTimeout(() => dead.remove(), 240);
     }
 

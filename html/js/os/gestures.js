@@ -52,8 +52,10 @@
         if (zone === 'bottom' && !down) {
             // Swipe up from the bottom bar: dismiss whatever is over the phone,
             // otherwise go home.
+            const nc = document.getElementById('notif-center');
             if (PhoneOS.controlCenter.isOpen()) PhoneOS.controlCenter.hide();
             else if (PhoneOS.spotlight.isOpen()) PhoneOS.spotlight.hide();
+            else if (nc && !nc.classList.contains('hidden')) nc.classList.add('hidden');
             else PhoneOS.router.home();
             acted = true;
         } else if (zone === 'top-right' && down) {

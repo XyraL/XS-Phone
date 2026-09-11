@@ -63,9 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.add('dev');
 
     const fitPreview = () => {
-        const s = Math.min(1, (innerHeight - 30) / 810, (innerWidth - 30) / 400);
-        document.getElementById('phone-root').style.transform =
-            `translate(50%, 50%) scale(${s})`;
+        const s = Math.min(1, (innerHeight - 24) / 780, (innerWidth - 24) / 360);
+        document.getElementById('phone-root').style.transform = `scale(${s})`;
     };
     fitPreview();
     window.addEventListener('resize', fitPreview);

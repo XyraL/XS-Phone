@@ -731,3 +731,13 @@
         transition-duration: 0.01ms !important;
     }
 }
+
+.cc-scrim { position: absolute; inset: 0; z-index: 84; background: rgba(0, 0, 0, 0.38); }
+.cc-handle {
+    width: 38px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--app-text-dim);
+    opacity: 0.55;
+    margin: 14px auto 0;
+}

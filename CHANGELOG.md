@@ -26,6 +26,8 @@ All notable changes to **XS-Phone**.
   now show placeholder rows while they load instead of flashing blank.
 
 ### Changed
+- The control centre closes by tapping anywhere outside it or flicking it back
+  up, not only by swiping up from the bottom bar.
 - Apps shrink back into the home screen when you leave them instead of vanishing.
 - Airplane Mode shows in the status bar so it can't be left on by accident.
 - Everything respects your system "reduce motion" setting.
