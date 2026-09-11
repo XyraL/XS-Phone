@@ -21,7 +21,31 @@
     function hideOverlay() {
         stopTimer();
         activeCall = null;
+        PhoneOS.island.clear('call');
         ensureOverlay().classList.add('hidden');
+    }
+
+    function dur(sec) {
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        return m + ':' + String(s).padStart(2, '0');
+    }
+
+    // While a call is up the island carries it, so leaving the call screen
+    // still shows who you are on with and for how long — tap to go back.
+    function islandForCall() {
+        if (!activeCall) return null;
+        const name = PhoneOS.resolveName(activeCall.number);
+        const sub = activeCall.phase === 'active' && activeCall.answeredAt
+            ? dur(Math.max(0, Math.floor((Date.now() - activeCall.answeredAt) / 1000)))
+            : (activeCall.phase === 'incoming' ? 'Incoming' : 'Calling…');
+        return {
+            icon: PhoneOS.glyphs.phone,
+            iconBg: 'linear-gradient(135deg,#68de7c,#28bd4c)',
+            title: name,
+            subtitle: sub,
+            onTap: () => { if (activeCall) renderOverlay(); },
+        };
     }
 
     function roundBtn(kind, label, onTap) {
@@ -43,6 +67,7 @@
         el.textContent = '';
         el.classList.remove('hidden');
         if (!activeCall) return;
+        PhoneOS.island.show('call', islandForCall);
 
         const name = PhoneOS.resolveName(activeCall.number);
 
@@ -334,7 +359,8 @@
         return content;
     }
 
-    async function render(view) {
+    async function render(view, params) {
+        if (params && params.tab) currentTab = params.tab;
         const fresh = PhoneOS.freshRender(view);
         view.textContent = '';
         view.append(ui.header('Phone'));

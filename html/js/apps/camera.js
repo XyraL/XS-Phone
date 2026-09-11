@@ -59,13 +59,14 @@
         return typeof url === 'string' ? url : null;
     }
 
-    function render(view) {
+    function render(view, params) {
         view.classList.add('camera-view');
-        selfie = false;
+        selfie = !!(params && params.selfie);
         zoom = 1;
         live = true;
         document.body.classList.add('cam-full');
         PhoneOS.nui('cameraMode', { active: true });
+        if (selfie) PhoneOS.nui('cameraFlip', { selfie: true });
 
         const oldHud = document.getElementById('camera-hud');
         if (oldHud) oldHud.remove();

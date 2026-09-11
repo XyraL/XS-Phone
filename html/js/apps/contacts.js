@@ -14,7 +14,10 @@
         }));
 
         const content = ui.content();
+        const skel = ui.skeleton(7);
+        view.append(skel);
         const contacts = await PhoneOS.loadContacts();
+        skel.remove();
 
         const search = ui.textInput({ placeholder: 'Search' });
         search.classList.add('search-input');

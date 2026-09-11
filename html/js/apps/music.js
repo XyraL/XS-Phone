@@ -14,10 +14,11 @@
                 devAudio.play().catch(() => {});
             } catch (e) {  }
             playing = track;
+            paintIsland();
             return true;
         }
         const res = await PhoneOS.nui('musicPlay', { url: track.url, volume });
-        if (res && res.ok) { playing = track; return true; }
+        if (res && res.ok) { playing = track; paintIsland(); return true; }
         PhoneOS.notify({ app: 'music', title: 'Music', body: res && res.error === 'no_xsound'
             ? 'This server doesn\'t have xsound installed.' : 'Couldn\'t play that track.' });
         return false;
@@ -31,6 +32,20 @@
             PhoneOS.nui('musicStop');
         }
         playing = null;
+        PhoneOS.island.clear('music');
+    }
+    PhoneOS.musicStop = stop;
+
+    function paintIsland() {
+        if (!playing) { PhoneOS.island.clear('music'); return; }
+        PhoneOS.island.show('music', {
+            icon: PhoneOS.glyphs.music,
+            iconBg: 'linear-gradient(135deg,#fc6076,#ff9a44)',
+            title: playing.title,
+            subtitle: 'Now playing',
+            right: 'bars',
+            onTap: () => PhoneOS.router.openApp('music'),
+        });
     }
 
     function setVolume(v) {

@@ -198,8 +198,11 @@
 
         const content = ui.content();
         content.classList.add('tw-content');
+        const skel = ui.skeleton(4);
+        view.append(skel);
         const res = await PhoneOS.api('social:feed', { scope: currentScope });
         if (!fresh()) return;
+        skel.remove();
         const posts = (res && res.ok && res.data) || [];
 
         if (!posts.length) {

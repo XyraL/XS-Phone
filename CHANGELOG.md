@@ -2,6 +2,34 @@
 
 All notable changes to **XS-Phone**.
 
+## [1.1.0] — 2026-09-11
+
+### Added
+- **The island at the top of the screen is alive now.** During a call it shows
+  who you're talking to and how long you've been on, and tapping it jumps back
+  to the call — so you can use the rest of the phone mid-call without losing it.
+  It does the same for music, with the track name and moving bars.
+- **Control centre.** Swipe down from the top-right for Airplane Mode, Do Not
+  Disturb, a **torch that actually lights the world in front of you**, screen
+  brightness, a music stop button and shortcuts to the camera and calculator.
+  These used to be buried in Settings.
+- **Swipe gestures.** Swipe up from the bottom bar to go home, swipe down on the
+  right for the control centre, on the left for notifications, and down on the
+  home screen to search.
+- **Search.** Swipe down on the home screen and type to find any app or contact
+  instead of hunting through the grid.
+- **Home screen widgets** — a clock and the current Los Santos weather, sitting
+  above your apps. Tap either to open the app.
+- **Hold an app icon for shortcuts** — Messages offers New Message, Phone offers
+  Keypad and Recents, Camera offers Take a Selfie.
+- **Loading placeholders.** Messages, Contacts, Mail, Garage, Prism and Chirp
+  now show placeholder rows while they load instead of flashing blank.
+
+### Changed
+- Apps shrink back into the home screen when you leave them instead of vanishing.
+- Airplane Mode shows in the status bar so it can't be left on by accident.
+- Everything respects your system "reduce motion" setting.
+
 ## [1.0.2] — 2026-09-06
 
 ### Fixed

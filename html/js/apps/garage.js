@@ -37,8 +37,11 @@
         view.append(ui.header('Garage'));
 
         const content = ui.content();
+        const skel = ui.skeleton(4);
+        view.append(skel);
         const res = await PhoneOS.api('garage:list');
         if (!fresh()) return;
+        skel.remove();
 
         if (!res || !res.ok) {
             const empty = document.createElement('div');

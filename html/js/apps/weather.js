@@ -80,6 +80,21 @@
         view.append(content);
     }
 
+    // The home-screen widget reads the same forecast as the app, from the same
+    // table — no second source of truth.
+    PhoneOS.weatherSummary = async () => {
+        const res = await PhoneOS.nui('getWeather');
+        const info = WEATHER[(res && res.ok && res.weather) || 'CLEAR'] || WEATHER.CLEAR;
+        const hour = (res && res.hour) ?? 12;
+        return {
+            icon: info.icon,
+            label: info.label,
+            temp: tempFor(info, hour),
+            hour,
+            minute: (res && res.minute) ?? 0,
+        };
+    };
+
     PhoneOS.registerApp({
         id: 'weather', name: 'Weather', store: true,
         iconBg: 'linear-gradient(135deg,#54b9f5,#2668d8)',

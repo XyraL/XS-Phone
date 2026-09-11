@@ -28,9 +28,12 @@
         }));
 
         const content = ui.content();
+        const skel = ui.skeleton(6);
+        view.append(skel);
         await PhoneOS.loadContacts();
         const threads = await loadThreads();
         if (!fresh()) return;
+        skel.remove();
 
         if (!threads.length) {
             const empty = document.createElement('div');
@@ -475,7 +478,9 @@
         iconBg: 'linear-gradient(135deg,#6bdd6f,#1fb336)',
         glyph: PhoneOS.glyphs.messages,
         render: (view, params) => {
-            if (params && params.composeTo) {
+            if (params && params.compose) {
+                composeScreen(view);
+            } else if (params && params.composeTo) {
                 loadThreads().then((threads) => {
                     const existing = threads.find((t) =>
                         !t.isGroup && t.others && t.others[0] === params.composeTo);

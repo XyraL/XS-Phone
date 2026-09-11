@@ -31,6 +31,7 @@ PhoneOS.clock = (() => {
         document.getElementById('ls-date').textContent =
             `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}`;
         paintBattery();
+        if (PhoneOS.paintWidgetClock) PhoneOS.paintWidgetClock();
     }
 
     setInterval(tick, 10000);

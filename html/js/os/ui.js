@@ -353,3 +353,30 @@ PhoneOS.loadContacts = async function (force) {
     PhoneOS.data.contacts = (res && res.ok && res.data) || [];
     return PhoneOS.data.contacts;
 };
+
+// Placeholder rows shown while a list loads, so a screen never flashes empty
+// and then jumps. Inert — purely visual.
+PhoneOS.ui.skeleton = function (rows, opts) {
+    const wrap = document.createElement('div');
+    wrap.className = 'skel-wrap';
+    if (opts && opts.className) wrap.classList.add(opts.className);
+    for (let i = 0; i < (rows || 3); i++) {
+        const r = document.createElement('div');
+        r.className = 'skel-row';
+        if (!(opts && opts.noAvatar)) {
+            const av = document.createElement('div');
+            av.className = 'skel-av';
+            r.append(av);
+        }
+        const lines = document.createElement('div');
+        lines.className = 'skel-lines';
+        const l1 = document.createElement('div');
+        l1.className = 'skel-line';
+        const l2 = document.createElement('div');
+        l2.className = 'skel-line short';
+        lines.append(l1, l2);
+        r.append(lines);
+        wrap.append(r);
+    }
+    return wrap;
+};

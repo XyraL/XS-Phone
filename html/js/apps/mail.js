@@ -71,8 +71,11 @@
         view.append(tabs);
 
         const content = ui.content();
+        const skel = ui.skeleton(5);
+        view.append(skel);
         const res = await PhoneOS.api('mail:list', { folder: currentFolder });
         if (!fresh()) return;
+        skel.remove();
         const mails = (res && res.ok && res.data) || [];
 
         if (!mails.length) {

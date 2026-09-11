@@ -41,8 +41,78 @@ PhoneOS.shell = (() => {
         label.textContent = PhoneOS.appName(def.id);
 
         el.append(icon, label);
-        el.addEventListener('click', () => PhoneOS.router.openApp(def.id, el));
+
+        // Tap opens the app. Press and hold pops its quick actions — the hold
+        // flag swallows the click so a long press never also launches the app.
+        let holdTimer = null;
+        let held = false;
+        const cancelHold = () => { clearTimeout(holdTimer); holdTimer = null; };
+        el.addEventListener('pointerdown', () => {
+            held = false;
+            if (!QUICK[def.id]) return;
+            holdTimer = setTimeout(() => { held = true; quickMenu(def, el); }, 450);
+        });
+        el.addEventListener('pointermove', cancelHold);
+        el.addEventListener('pointerup', cancelHold);
+        el.addEventListener('pointercancel', cancelHold);
+        el.addEventListener('click', (e) => {
+            cancelHold();
+            if (held) { e.preventDefault(); e.stopPropagation(); held = false; return; }
+            PhoneOS.router.openApp(def.id, el);
+        });
         return el;
+    }
+
+    const QUICK = {
+        messages: [{ label: 'New Message', params: { compose: true } }],
+        phone: [
+            { label: 'Keypad', params: { tab: 'keypad' } },
+            { label: 'Recents', params: { tab: 'recents' } },
+        ],
+        camera: [{ label: 'Take a Selfie', params: { selfie: true } }],
+    };
+
+    function quickMenu(def, slotEl) {
+        const actions = QUICK[def.id];
+        if (!actions) return;
+        PhoneOS.sounds.tick();
+
+        const overlay = document.createElement('div');
+        overlay.className = 'picker-overlay';
+        const sheet = document.createElement('div');
+        sheet.className = 'picker-sheet';
+        const title = document.createElement('div');
+        title.className = 'picker-title';
+        title.textContent = PhoneOS.appName(def.id);
+        sheet.append(title);
+
+        actions.forEach((a, i) => {
+            const b = document.createElement('button');
+            b.className = 'confirm-btn' + (i === 0 ? ' confirm-primary' : '');
+            b.textContent = a.label;
+            b.addEventListener('click', () => {
+                overlay.remove();
+                PhoneOS.router.openApp(def.id, slotEl, a.params);
+            });
+            sheet.append(b);
+        });
+
+        const openBtn = document.createElement('button');
+        openBtn.className = 'confirm-btn';
+        openBtn.textContent = 'Open';
+        openBtn.addEventListener('click', () => {
+            overlay.remove();
+            PhoneOS.router.openApp(def.id, slotEl);
+        });
+        const cancel = document.createElement('button');
+        cancel.className = 'confirm-btn';
+        cancel.textContent = 'Cancel';
+        cancel.addEventListener('click', () => overlay.remove());
+        sheet.append(openBtn, cancel);
+
+        overlay.append(sheet);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        document.getElementById('phone-screen').append(overlay);
     }
 
     function buildHome() {
@@ -55,9 +125,64 @@ PhoneOS.shell = (() => {
             if (def.store && !installed.includes(def.id)) continue;
             (def.dock ? dock : grid).append(slot(def));
         }
+        buildWidgets();
         renderBadges();
     }
     PhoneOS.rebuildHome = buildHome;
+
+    function paintWidgetClock() {
+        const t = document.getElementById('w-time');
+        const d = document.getElementById('w-date');
+        if (!t || !d) return;
+        const now = new Date();
+        t.textContent = PhoneOS.clock.timeString(now);
+        d.textContent = now.toLocaleDateString(undefined,
+            { weekday: 'long', month: 'long', day: 'numeric' });
+    }
+    PhoneOS.paintWidgetClock = paintWidgetClock;
+
+    async function buildWidgets() {
+        const box = document.getElementById('widgets');
+        if (!box) return;
+        box.textContent = '';
+
+        const clock = document.createElement('div');
+        clock.className = 'widget widget-clock';
+        const wt = document.createElement('div');
+        wt.className = 'w-time';
+        wt.id = 'w-time';
+        const wd = document.createElement('div');
+        wd.className = 'w-date';
+        wd.id = 'w-date';
+        clock.append(wt, wd);
+        clock.addEventListener('click', () => PhoneOS.router.openApp('clock'));
+
+        const wx = document.createElement('div');
+        wx.className = 'widget widget-wx';
+        const wxIcon = document.createElement('div');
+        wxIcon.className = 'w-wx-icon';
+        wxIcon.textContent = '·';
+        const wxTemp = document.createElement('div');
+        wxTemp.className = 'w-wx-temp';
+        wxTemp.textContent = '--';
+        const wxLabel = document.createElement('div');
+        wxLabel.className = 'w-wx-label';
+        wxLabel.textContent = 'Los Santos';
+        wx.append(wxIcon, wxTemp, wxLabel);
+        wx.addEventListener('click', () => PhoneOS.router.openApp('weather'));
+
+        box.append(clock, wx);
+        paintWidgetClock();
+
+        if (PhoneOS.weatherSummary) {
+            const s = await PhoneOS.weatherSummary().catch(() => null);
+            if (s && document.body.contains(wx)) {
+                wxIcon.textContent = s.icon;
+                wxTemp.textContent = s.temp + '°';
+                wxLabel.textContent = s.label;
+            }
+        }
+    }
 
     function renderBadges() {
         document.querySelectorAll('.app-slot').forEach((el) => {

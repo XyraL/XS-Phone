@@ -229,3 +229,38 @@ RegisterNUICallback('saveSettings', function(data, cb)
     end
     cb(res)
 end)
+
+local torchOn = false
+
+RegisterNUICallback('torch', function(data, cb)
+    local want = data and data.on == true
+    if want == torchOn then
+        cb({ ok = true })
+        return
+    end
+    torchOn = want
+
+    if torchOn then
+        CreateThread(function()
+            while torchOn do
+                local ped = PlayerPedId()
+                local pos = GetEntityCoords(ped)
+                local fwd = GetEntityForwardVector(ped)
+                local from = pos + fwd * 0.35 + vector3(0.0, 0.0, 0.55)
+                DrawSpotLight(
+                    from.x, from.y, from.z,
+                    fwd.x, fwd.y, fwd.z - 0.12,
+                    255, 250, 235,
+                    22.0, 2.0, 0.0, 11.0, 1.2
+                )
+                Wait(0)
+            end
+        end)
+    end
+
+    cb({ ok = true })
+end)
+
+AddEventHandler('onResourceStop', function(res)
+    if res == GetCurrentResourceName() then torchOn = false end
+end)

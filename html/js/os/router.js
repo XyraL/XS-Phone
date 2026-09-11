@@ -22,6 +22,8 @@ PhoneOS.router = (() => {
 
         const layer = document.getElementById('app-layer');
         if (currentApp && currentApp.onClose) currentApp.onClose();
+        closeSeq++;                       // cancel any close still animating out
+        layer.classList.remove('closing');
         layer.textContent = '';
 
         if (slotEl) {
@@ -46,15 +48,32 @@ PhoneOS.router = (() => {
         def.render(view, params);
     }
 
+    // Apps shrink back toward the home screen instead of blinking out. The
+    // sequence number cancels a pending clear if something reopens mid-animation,
+    // so a fast tap can never wipe the app that just opened.
+    let closeSeq = 0;
+
     function home() {
         if (currentApp && currentApp.onClose) currentApp.onClose();
         const layer = document.getElementById('app-layer');
-        layer.classList.add('hidden');
-        layer.textContent = '';
         currentApp = null;
         if (!PhoneOS.shell.isLocked()) {
             document.getElementById('homescreen').classList.remove('hidden');
         }
+
+        const seq = ++closeSeq;
+        if (layer.classList.contains('hidden') || !layer.children.length) {
+            layer.classList.add('hidden');
+            layer.textContent = '';
+            return;
+        }
+        layer.classList.add('closing');
+        setTimeout(() => {
+            if (seq !== closeSeq) return;
+            layer.classList.remove('closing');
+            layer.classList.add('hidden');
+            layer.textContent = '';
+        }, 200);
     }
 
     function current() {

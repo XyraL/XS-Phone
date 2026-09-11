@@ -42,6 +42,11 @@
 | App Store | Optional apps install per character, including two games |
 | Plus | Notes, Clock with working alarms, Calculator, Weather, full Settings |
 
+The phone itself works like a phone: the island at the top comes alive during a
+call or while music plays, swipe down from the right for a control centre with a
+working torch, swipe down on the home screen to search, swipe up to go home, and
+hold an app icon for its shortcuts. Clock and weather widgets sit above the apps.
+
 Chirp, Prism, Sparks and Mail are real accounts — username and password. Log
 in from any phone and your whole profile follows you. Log out and hand your
 burner account to someone else if that's your thing.
