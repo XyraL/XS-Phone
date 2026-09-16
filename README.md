@@ -88,13 +88,26 @@ the phone mid-anything and it reopens right where you left it.
        weight = 190,
        stack = false,
        consume = 0,
+       client = { event = 'XS-Phone:client:use' },
    },
    ```
+
+   On ox_inventory that `client.event` line is what opens the phone — it does
+   not use the framework's useable-item system, so without it the item sits
+   there and nothing happens. If you kept your server's existing `phone` item,
+   add the line to that definition. The open key and `/phone` work either way.
 
    qb-core, in `shared/items.lua`:
    ```lua
    phone = { name = 'phone', label = 'Phone', weight = 190, type = 'item', image = 'phone.png', unique = true, useable = true, shouldClose = true, description = 'A smartphone' },
    ```
+
+   A `phone.png` ships in `inventory_images/` if you want it — most servers
+   already have one they like, so this is optional. It goes in
+   `ox_inventory/web/images/`, `qb-inventory/html/images/`,
+   `ps-inventory/html/images/`, `qs-inventory/html/images/`,
+   `codem-inventory/html/itemimages/` or `core_inventory/html/img/`, depending
+   on what you run.
 5. Set up the camera. Make a free account at [fivemanage.com](https://fivemanage.com),
    copy an image API token, paste it into `Config.Phone.Media.apiKey`. Done.
 6. Go through `config.lua`. The big ones: your businesses list for the City
