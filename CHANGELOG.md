@@ -2,6 +2,17 @@
 
 All notable changes to **XS-Phone**.
 
+## [1.1.1] — 2026-09-29
+
+Bug fixes.
+
+- Fixed the Garage app showing cars as out when they were parked in a garage
+- The Garage app now works with jg-advancedgarages
+
+## Updating
+
+Replace everything except your config.lua. No SQL to run.
+
 ## [1.1.0] — 2026-09-11
 
 ### Added

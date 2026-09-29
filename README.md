@@ -120,8 +120,9 @@ the phone mid-anything and it reopens right where you left it.
 - **911 and business lines**: no dispatch script needed. Calls and texts to a
   business number go straight to an on-duty worker's phone.
 - **Garages**: reads `player_vehicles` (stock on both frameworks), and it
-  handles builds that store the model as a hash instead of a name. Different
-  table? Change one line in the config.
+  handles builds that store the model as a hash instead of a name. Works with
+  qb-garages, Qbox and jg-advancedgarages. Different table? Change one line in
+  the config.
 - **Vehicle keys**: the valet hands out keys for both common key systems.
 
 ## Exports
@@ -148,6 +149,8 @@ exports['XS-Phone']:IsPhoneOpen()
   the name doesn't match `Config.Phone.Item.name`.
 - **Garage app is empty**: your server uses a different vehicles table. Point
   `Config.Phone.Garage.table` at it.
+- **Cars show as out when they're parked**: set `Config.Phone.Garage.stateFrom`
+  to the column your garage script uses.
 - **Music won't play**: xsound isn't installed.
 
 ## My other scripts

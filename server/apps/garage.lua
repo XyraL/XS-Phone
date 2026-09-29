@@ -11,6 +11,47 @@ local function modelOf(row)
     return nil, hash
 end
 
+local function parkingMode(row)
+    local mode = Config.Phone.Garage.stateFrom or 'auto'
+    if mode ~= 'auto' then return mode end
+    if row.in_garage ~= nil then return 'in_garage' end
+    if row.stored ~= nil then return 'stored' end
+    return 'state'
+end
+
+local function stateOf(row)
+    if DbBool(row.impound) or DbBool(row.impounded) then return 2 end
+
+    local mode = parkingMode(row)
+    if mode == 'in_garage' then return DbBool(row.in_garage) and 1 or 0 end
+    if mode == 'stored' then return DbBool(row.stored) and 1 or 0 end
+
+    local s = row.state
+    if s == true then return 1 end
+    s = tonumber(s)
+    if s == 1 or s == 2 then return s end
+    return 0
+end
+
+local function setParked(citizenid, row, mode, parked)
+    local sets, args = {}, {}
+    if mode == 'in_garage' or mode == 'stored' then
+        sets[#sets + 1] = ('`%s` = ?'):format(mode)
+        args[#args + 1] = parked and 1 or 0
+    end
+    if row.state ~= nil then
+        sets[#sets + 1] = '`state` = ?'
+        args[#args + 1] = parked and 1 or 0
+    end
+    if #sets == 0 then return false end
+
+    args[#args + 1] = citizenid
+    args[#args + 1] = row.plate
+    local ok = pcall(MySQL.update.await, ('UPDATE `%s` SET %s WHERE citizenid = ? AND plate = ?')
+        :format(Config.Phone.Garage.table, table.concat(sets, ', ')), args)
+    return ok
+end
+
 PhoneCallback('XS-Phone:garage:list', function(src)
     if not Config.Phone.Garage.enabled then return { ok = false, error = 'disabled' } end
 
@@ -33,8 +74,8 @@ PhoneCallback('XS-Phone:garage:list', function(src)
             model = name,
             hash = hash,
             plate = v.plate,
-            garage = v.garage,
-            state = tonumber(v.state) or 0,
+            garage = v.garage or v.garage_id,
+            state = stateOf(v),
             fuel = math.floor(tonumber(v.fuel) or 0),
             engine = math.floor((tonumber(v.engine) or 1000) / 10),
             body = math.floor((tonumber(v.body) or 1000) / 10),
@@ -92,7 +133,7 @@ PhoneCallback('XS-Phone:garage:valet', function(src, data)
 
     local row = ownedPlate(src, data and data.plate)
     if not row then return { ok = false, error = 'not_yours' } end
-    if tonumber(row.state) ~= 1 then return { ok = false, error = 'not_garaged' } end
+    if stateOf(row) ~= 1 then return { ok = false, error = 'not_garaged' } end
 
     local name, hash = modelOf(row)
     if not name and not hash then return { ok = false, error = 'no_model' } end
@@ -105,15 +146,13 @@ PhoneCallback('XS-Phone:garage:valet', function(src, data)
         return { ok = false, error = 'insufficient' }
     end
 
-    local ok = pcall(MySQL.update.await, ([[
-        UPDATE `%s` SET state = 0 WHERE citizenid = ? AND plate = ?
-    ]]):format(Config.Phone.Garage.table), { Framework.GetCitizenId(src), row.plate })
-    if not ok then
+    local mode = parkingMode(row)
+    if not setParked(Framework.GetCitizenId(src), row, mode, false) then
         Framework.AddMoney(src, valet.account or 'bank', cost, 'phone valet refund')
         return { ok = false, error = 'failed' }
     end
 
-    pendingValet[src] = { plate = row.plate, cost = cost, expires = os.time() + 120 }
+    pendingValet[src] = { row = row, mode = mode, cost = cost, expires = os.time() + 120 }
 
     SetTimeout((valet.delay or 12) * 1000, function()
         if GetPlayerPed(src) == 0 then return end
@@ -143,9 +182,7 @@ RegisterNetEvent('XS-Phone:valetFailed', function()
 
     local citizenid = Framework.GetCitizenId(src)
     if not citizenid then return end
-    pcall(MySQL.update.await, ([[
-        UPDATE `%s` SET state = 1 WHERE citizenid = ? AND plate = ?
-    ]]):format(Config.Phone.Garage.table), { citizenid, pending.plate })
+    setParked(citizenid, pending.row, pending.mode, true)
     Framework.AddMoney(src, Config.Phone.Garage.Valet.account or 'bank',
         pending.cost, 'phone valet refund')
     Framework.Notify(src, 'The valet couldn\'t bring your car out — you were refunded.', 'error')

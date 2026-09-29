@@ -133,11 +133,15 @@ Config.Phone = {
         DefaultInstalled = { 'social', 'prism', 'market', 'music', 'weather' },
     },
 
-    -- The Garage app only reads this table, it never spawns anything.
+    -- The Garage app reads this table.
     -- player_vehicles is correct for stock qb-core and QBox.
     Garage = {
         enabled = true,
         table = 'player_vehicles',
+        -- Which column says a car is parked. 'auto' uses in_garage when your table
+        -- has it (jg-advancedgarages does), then stored, then state.
+        -- Set 'state', 'in_garage' or 'stored' to force one.
+        stateFrom = 'auto',
         -- Mark an out vehicle on the GPS.
         Ping = { enabled = true },
         -- Pay to get a garaged car delivered to you.
