@@ -230,9 +230,10 @@ RegisterNetEvent('XS-Phone:client:valetSpawn', function(data)
         TriggerServerEvent('XS-Phone:valetFailed')
         return
     end
-    TriggerServerEvent('XS-Phone:valetOk')
 
     SetVehicleNumberPlateText(veh, data.plate)
+    TriggerServerEvent('XS-Phone:valetOk', NetworkGetNetworkIdFromEntity(veh))
+
     SetVehicleOnGroundProperly(veh)
     SetVehicleDoorsLocked(veh, 1)
 
@@ -240,9 +241,6 @@ RegisterNetEvent('XS-Phone:client:valetSpawn', function(data)
         local props = json.decode(data.mods)
         if props then pcall(lib.setVehicleProperties, veh, props) end
     end
-
-    pcall(function() TriggerEvent('vehiclekeys:client:SetOwner', data.plate) end)
-    pcall(function() exports.qbx_vehiclekeys:GiveKeys(data.plate) end)
 
     SetVehicleEngineOn(veh, false, true, false)
 
@@ -253,6 +251,12 @@ RegisterNetEvent('XS-Phone:client:valetSpawn', function(data)
     SetTimeout(20000, function()
         if DoesBlipExist(blip) then RemoveBlip(blip) end
     end)
+end)
+
+-- Key scripts other than qbx_vehiclekeys and qb-vehiclekeys listen for the
+-- old QBCore event on the client.
+RegisterNetEvent('XS-Phone:client:valetKeys', function(plate)
+    pcall(function() TriggerEvent('vehiclekeys:client:SetOwner', plate) end)
 end)
 
 AddEventHandler('onResourceStop', function(res)

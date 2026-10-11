@@ -170,8 +170,41 @@ PhoneCallback('XS-Phone:garage:valet', function(src, data)
     return { ok = true, data = { cost = cost, delay = valet.delay or 12 } }
 end)
 
-RegisterNetEvent('XS-Phone:valetOk', function()
-    pendingValet[source] = nil
+-- Keys for the car the valet just brought, and only that car: the plate comes
+-- from the request the server already approved, never from the client.
+local function giveValetKeys(src, plate, netId)
+    plate = (tostring(plate or ''):gsub('^%s+', ''):gsub('%s+$', ''))
+    if plate == '' then return end
+
+    if GetResourceState('qbx_vehiclekeys') == 'started' then
+        -- A car spawned a moment ago can still be on its way to the server.
+        local veh = 0
+        for _ = 1, 30 do
+            veh = NetworkGetEntityFromNetworkId(tonumber(netId) or 0)
+            if veh ~= 0 and DoesEntityExist(veh) then break end
+            Wait(100)
+        end
+        if veh ~= 0 and DoesEntityExist(veh) then
+            pcall(function() exports.qbx_vehiclekeys:GiveKeys(src, veh, true) end)
+        end
+        return
+    end
+
+    if GetResourceState('qb-vehiclekeys') == 'started'
+        and pcall(function() exports['qb-vehiclekeys']:GiveKeys(src, plate) end) then
+        return
+    end
+
+    TriggerClientEvent('XS-Phone:client:valetKeys', src, plate)
+end
+
+RegisterNetEvent('XS-Phone:valetOk', function(netId)
+    local src = source
+    local pending = pendingValet[src]
+    pendingValet[src] = nil
+    if not pending or os.time() > pending.expires then return end
+
+    giveValetKeys(src, pending.row.plate, netId)
 end)
 
 RegisterNetEvent('XS-Phone:valetFailed', function()
