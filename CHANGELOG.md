@@ -2,6 +2,14 @@
 
 All notable changes to **XS-Phone**.
 
+## [1.1.2] — 2026-10-11
+
+- Fixed cars brought by the valet coming without keys on servers running qb-vehiclekeys or qbx_vehiclekeys
+
+## Updating
+
+Replace everything except your config.lua. No SQL to run.
+
 ## [1.1.1] — 2026-09-29
 
 Bug fixes.
