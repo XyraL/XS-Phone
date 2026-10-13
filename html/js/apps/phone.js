@@ -366,6 +366,15 @@
                 PhoneOS.sounds.startRing(PhoneOS.state && PhoneOS.state.settings.ringtone);
             }
             renderOverlay();
+            if (!PhoneOS.data.contacts) {
+                const id = activeCall.callId;
+                PhoneOS.loadContacts().then(() => {
+                    if (!activeCall || activeCall.callId !== id) return;
+                    const el = document.getElementById('call-overlay');
+                    if (el && !el.classList.contains('hidden')) renderOverlay();
+                    else PhoneOS.island.show('call', islandForCall);
+                });
+            }
             return;
         }
         if (!activeCall || (data.callId && activeCall.callId && data.callId !== activeCall.callId)) return;

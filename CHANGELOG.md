@@ -29,6 +29,7 @@ A whole new look and a lot of new apps.
 - New Crypto app: buy, sell and send coins with prices that move every minute
 - New Home app: lock your door, give and take keys, and see who rang the doorbell
 - Fixed Set GPS sometimes not setting a route
+- Fixed calls from a saved contact showing their number instead of their name
 
 ## Updating
 

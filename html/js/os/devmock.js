@@ -99,11 +99,11 @@
         ],
         garage: [
             { model: 'sultan', label: 'Sultan', image: 'sultan', plate: '58ADR422', garage: 'Legion Square', state: 1, fuel: 82, engine: 96, body: 88 },
-            { model: 'youga', label: 'Youga', image: 'youga', plate: 'CPHR 001', garage: null, state: 0, fuel: 34, engine: 61, body: 44,
+            { model: 'youga', label: 'Youga', image: 'youga', plate: 'XYRAL 01', garage: null, state: 0, fuel: 34, engine: 61, body: 44,
               live: { x: 241.2, y: -860.4, dist: 120, locked: true, engine: false } },
             { model: 'bati801', label: 'Bati 801', image: 'bati801', plate: 'FAST BOI', garage: 'Impound', state: 2, fuel: 12, engine: 22, body: 18 },
         ],
-        carHolders: { 'CPHR 001': [{ cid: 'ROS1', number: '555-0333', expires: Date.now() + 3 * 3600000 }] },
+        carHolders: { 'XYRAL 01': [{ cid: 'ROS1', number: '555-0333', expires: Date.now() + 3 * 3600000 }] },
         sharedToMe: [{ plate: 'TUNA 77', model: 'comet2', label: 'Comet', image: 'comet2', owner: 'Big Tuna', expires: Date.now() + 26 * 3600000 }],
         music: [
             { id: 700, title: 'Late Night Drive', url: 'https://example.com/track1.mp3' },
