@@ -2,6 +2,39 @@
 
 All notable changes to **XS-Phone**.
 
+## [2.0.0] — 2026-10-13
+
+A whole new look and a lot of new apps.
+
+- New look: the latest iPhone design with a glass dock, widgets and buttons, new icons and a new font
+- Thinner Pro frame with the Action and Camera Control buttons, in nine colours
+- Swipe between home screen pages, with a Smart Stack widget
+- Hold an app to move it, remove it or use its shortcuts
+- New lock screen with widgets under the clock, a torch button and Live Activities
+- Apps open out of their icon, and you swipe from the left edge to go back
+- Set your own photo that people see when you call or text them, shared with everyone or only your contacts
+- Pick one of your photos as your wallpaper right from Settings
+- New Maps app: see where you are, save places, find places around the city and set your GPS
+- Share your location in Messages, or send any spot on the map to a contact
+- New Services app: every business you list, open or closed, with call, text and GPS
+- 911 and 912 ring on-duty police and EMS, who answer as 911 and 912, never their own number
+- Texts to 911, 912 and business lines go to a shared inbox for everyone on duty
+- Group calls: add people to a call, up to five at once
+- Garage redesigned with car pictures and Out, Garaged and Impound tabs
+- Find, lock, unlock, honk, flash and start your car from the phone
+- The valet now drives your car to you, with a live ETA on the island and lock screen
+- Car Keys in the Wallet, and lend a key to a contact for an hour, a day or until you take it back
+- Bills in the Wallet: pay or decline bills and fines, and send bills while on duty
+- New Weazel News app: reporters publish stories with photos and breaking news alerts every phone
+- New Crypto app: buy, sell and send coins with prices that move every minute
+- New Home app: lock your door, give and take keys, and see who rang the doorbell
+- Fixed Set GPS sometimes not setting a route
+
+## Updating
+
+Replace the whole folder, including config.lua. A lot of it is new, so copy
+your own settings into the new one. No SQL to run.
+
 ## [1.1.2] — 2026-10-11
 
 - Fixed cars brought by the valet coming without keys on servers running qb-vehiclekeys or qbx_vehiclekeys

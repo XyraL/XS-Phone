@@ -1,5 +1,5 @@
 PhoneOS.island = (() => {
-    const PRIORITY = { call: 3, timer: 2, music: 1 };
+    const PRIORITY = { call: 4, valet: 3, timer: 2, music: 1 };
     const activities = new Map();
     let ticker = null;
 
@@ -83,6 +83,12 @@ PhoneOS.island = (() => {
         paint();
     }
 
+    function current() {
+        const best = top();
+        if (!best) return null;
+        return typeof best.src === 'function' ? best.src() : best.src;
+    }
+
     function clearAll() {
         activities.clear();
         retime();
@@ -91,5 +97,5 @@ PhoneOS.island = (() => {
 
     PhoneOS.on('phone:close', clearAll);
 
-    return { show, clear, clearAll, has: (k) => activities.has(k) };
+    return { show, clear, clearAll, current, has: (k) => activities.has(k) };
 })();

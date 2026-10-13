@@ -49,24 +49,27 @@ local function createThread(isGroup, name, members)
     return id
 end
 
-local function deliver(threadId, sender, body, mediaUrl)
+local function deliver(threadId, sender, body, mediaUrl, location)
     local msgId = MySQL.insert.await(
-        'INSERT INTO phone_messages (thread_id, sender_number, body, media_url) VALUES (?, ?, ?, ?)',
-        { threadId, sender, body, mediaUrl })
+        'INSERT INTO phone_messages (thread_id, sender_number, body, media_url, location) VALUES (?, ?, ?, ?, ?)',
+        { threadId, sender, body, mediaUrl, location and json.encode(location) or nil })
     MySQL.update.await(
         'UPDATE phone_thread_members SET last_read = ? WHERE thread_id = ? AND number = ?',
         { msgId, threadId, sender })
 
     local message = {
         id = msgId, threadId = threadId, sender = sender,
-        body = body, media = mediaUrl, sentAt = os.time() * 1000,
+        body = body, media = mediaUrl, location = location, sentAt = os.time() * 1000,
     }
 
     local others = MySQL.query.await(
         'SELECT number, muted FROM phone_thread_members WHERE thread_id = ? AND number != ?',
         { threadId, sender })
     for _, m in ipairs(others) do
-        if DbBool(m.muted) then
+        local line = LineFor and LineFor(m.number)
+        if line then
+            NotifyLine(line, { line = tostring(line.number), label = line.label, threadId = threadId, message = message })
+        elseif DbBool(m.muted) then
             if Config.Debug then print(('^3[XS-Phone]^0 text to %s not pushed: thread muted (muted=%s)'):format(m.number, tostring(m.muted))) end
         elseif IsBlockedBy(m.number, sender) then
             if Config.Debug then print(('^3[XS-Phone]^0 text to %s not pushed: sender %s blocked'):format(m.number, sender)) end
@@ -89,6 +92,7 @@ PhoneCallback('XS-Phone:messages:threads', function(src)
                 WHERE m.thread_id = t.id AND m.id > tm.last_read
                   AND m.sender_number != tm.number) AS unread,
             lm.body AS lastBody, lm.media_url AS lastMedia, lm.sender_number AS lastSender,
+            (lm.location IS NOT NULL) AS lastLocation,
             UNIX_TIMESTAMP(lm.sent_at) * 1000 AS lastAt
         FROM phone_thread_members tm
         JOIN phone_threads t ON t.id = tm.thread_id
@@ -112,7 +116,7 @@ PhoneCallback('XS-Phone:messages:getThread', function(src, data)
 
     local before = tonumber(data.before)
     local rows = MySQL.query.await([[
-        SELECT id, sender_number AS sender, body, media_url AS media,
+        SELECT id, sender_number AS sender, body, media_url AS media, location,
                UNIX_TIMESTAMP(sent_at) * 1000 AS sentAt
         FROM phone_messages
         WHERE thread_id = ? AND (? IS NULL OR id < ?)
@@ -122,7 +126,11 @@ PhoneCallback('XS-Phone:messages:getThread', function(src, data)
     local hasMore = #rows > PAGE_SIZE
     if hasMore then rows[#rows] = nil end
     local messages = {}
-    for i = #rows, 1, -1 do messages[#messages + 1] = rows[i] end
+    for i = #rows, 1, -1 do
+        local row = rows[i]
+        row.location = DecodeLocation(row.location)
+        messages[#messages + 1] = row
+    end
 
     if not before then
         MySQL.update.await([[
@@ -163,27 +171,41 @@ PhoneCallback('XS-Phone:messages:send', function(src, data)
         mediaUrl = tostring(data.mediaUrl)
         if not OwnsPhoto(me, mediaUrl) then return { ok = false, error = 'bad_media' } end
     end
-    if body == '' and not mediaUrl then return { ok = false, error = 'empty' } end
+    local location = nil
+    if type(data.location) == 'table' then
+        if data.location.mine then
+            local ped = GetPlayerPed(src)
+            if ped == 0 then return { ok = false, error = 'bad_location' } end
+            local c = GetEntityCoords(ped)
+            location = { x = math.floor(c.x * 10 + 0.5) / 10, y = math.floor(c.y * 10 + 0.5) / 10, live = true }
+        else
+            local x, y = MapPoint(data.location)
+            if not x then return { ok = false, error = 'bad_location' } end
+            location = { x = x, y = y }
+        end
+        local label = MapLabel(data.location.label, 60)
+        if label ~= '' then location.label = label end
+    end
+    if body == '' and not mediaUrl and not location then return { ok = false, error = 'empty' } end
 
     local threadId = tonumber(data.threadId)
     if threadId then
         if not isMember(threadId, me) then return { ok = false, error = 'not_member' } end
     else
+        local biz = LineFromInput(data.to)
         local to
-        local biz, lines = ResolveBusinessLine(data.to, me)
         if biz then
-            if not lines or #lines == 0 then return { ok = false, error = 'invalid_number' } end
-            to = lines[math.random(#lines)]
+            to = tostring(biz.number)
         else
             to = NormalizeNumber(data.to or '')
+            if not to or to == me then return { ok = false, error = 'invalid_number' } end
+            local exists = MySQL.scalar.await('SELECT 1 FROM phone_phones WHERE number = ?', { to })
+            if not exists then return { ok = false, error = 'invalid_number' } end
         end
-        if not to or to == me then return { ok = false, error = 'invalid_number' } end
-        local exists = MySQL.scalar.await('SELECT 1 FROM phone_phones WHERE number = ?', { to })
-        if not exists then return { ok = false, error = 'invalid_number' } end
         threadId = findDirectThread(me, to) or createThread(false, nil, { me, to })
     end
 
-    local message = deliver(threadId, me, body, mediaUrl)
+    local message = deliver(threadId, me, body, mediaUrl, location)
     return { ok = true, data = message }
 end)
 
@@ -252,6 +274,8 @@ PhoneCallback('XS-Phone:messages:leave', function(src, data)
     end
     return { ok = true }
 end)
+
+DeliverMessage = deliver
 
 exports('SendMessage', function(fromDisplay, number, body)
     local service = tostring(fromDisplay or ''):upper():gsub('[^%w]', ''):sub(1, 12)

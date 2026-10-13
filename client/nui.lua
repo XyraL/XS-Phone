@@ -20,6 +20,7 @@ local API = {
     ['calls:answer']         = 'XS-Phone:calls:answer',
     ['calls:decline']        = 'XS-Phone:calls:decline',
     ['calls:hangup']         = 'XS-Phone:calls:hangup',
+    ['calls:add']            = 'XS-Phone:calls:add',
     ['calls:history']        = 'XS-Phone:calls:history',
 
     ['pin:verify']           = 'XS-Phone:pin:verify',
@@ -72,8 +73,13 @@ local API = {
 
     ['city:list']            = 'XS-Phone:city:list',
     ['city:setAnnouncement'] = 'XS-Phone:city:setAnnouncement',
+    ['line:threads']         = 'XS-Phone:line:threads',
+    ['line:messages']        = 'XS-Phone:line:messages',
+    ['line:send']            = 'XS-Phone:line:send',
 
     ['phone:changeNumber']   = 'XS-Phone:phone:changeNumber',
+    ['profile:photos']       = 'XS-Phone:profile:photos',
+    ['profile:setPhoto']     = 'XS-Phone:profile:setPhoto',
 
     ['darkchat:rooms']       = 'XS-Phone:darkchat:rooms',
     ['darkchat:create']      = 'XS-Phone:darkchat:create',
@@ -93,6 +99,11 @@ local API = {
     ['garage:list']          = 'XS-Phone:garage:list',
     ['garage:ping']          = 'XS-Phone:garage:ping',
     ['garage:valet']         = 'XS-Phone:garage:valet',
+    ['garage:car']           = 'XS-Phone:garage:car',
+    ['garage:remote']        = 'XS-Phone:garage:remote',
+    ['garage:keys']          = 'XS-Phone:garage:keys',
+    ['garage:shareKey']      = 'XS-Phone:garage:shareKey',
+    ['garage:revokeKey']     = 'XS-Phone:garage:revokeKey',
 
     ['gallery:importUrl']    = 'XS-Phone:gallery:importUrl',
 
@@ -110,6 +121,37 @@ local API = {
     ['music:list']           = 'XS-Phone:music:list',
     ['music:add']            = 'XS-Phone:music:add',
     ['music:delete']         = 'XS-Phone:music:delete',
+
+    ['maps:list']            = 'XS-Phone:maps:list',
+    ['maps:save']            = 'XS-Phone:maps:save',
+    ['maps:delete']          = 'XS-Phone:maps:delete',
+
+    ['news:list']            = 'XS-Phone:news:list',
+    ['news:get']             = 'XS-Phone:news:get',
+    ['news:post']            = 'XS-Phone:news:post',
+    ['news:delete']          = 'XS-Phone:news:delete',
+
+    ['crypto:market']        = 'XS-Phone:crypto:market',
+    ['crypto:coin']          = 'XS-Phone:crypto:coin',
+    ['crypto:trade']         = 'XS-Phone:crypto:trade',
+    ['crypto:send']          = 'XS-Phone:crypto:send',
+
+    ['bills:list']           = 'XS-Phone:bills:list',
+    ['bills:pay']            = 'XS-Phone:bills:pay',
+    ['bills:decline']        = 'XS-Phone:bills:decline',
+    ['bills:send']           = 'XS-Phone:bills:send',
+
+    ['home:list']            = 'XS-Phone:home:list',
+    ['home:lock']            = 'XS-Phone:home:lock',
+    ['home:giveKey']         = 'XS-Phone:home:giveKey',
+    ['home:removeKey']       = 'XS-Phone:home:removeKey',
+    ['home:letIn']           = 'XS-Phone:home:letIn',
+}
+
+local RELAYS = {
+    ['qb-houses:server:giveHouseKey'] = true,
+    ['qb-houses:server:removeHouseKey'] = true,
+    ['qb-houses:server:OpenDoor'] = true,
 }
 
 local function vehicleLabel(model, hash)
@@ -118,14 +160,15 @@ local function vehicleLabel(model, hash)
         local display = GetDisplayNameFromVehicleModel(hash)
         if display and display ~= 'NULL' and display ~= 'CARNOTFOUND' then
             local label = GetLabelText(display)
-            if label and label ~= 'NULL' then return label end
-            return display
+            local image = type(model) == 'string' and model ~= '' and model:lower() or display:lower()
+            if label and label ~= 'NULL' then return label, image end
+            return display, image
         end
     end
     if type(model) == 'string' and model ~= '' then
-        return model:sub(1, 1):upper() .. model:sub(2)
+        return model:sub(1, 1):upper() .. model:sub(2), model:lower()
     end
-    return 'Vehicle'
+    return 'Vehicle', nil
 end
 
 RegisterNUICallback('api', function(req, cb)
@@ -137,8 +180,18 @@ RegisterNUICallback('api', function(req, cb)
     local res = AwaitServer(target, req.data)
     if req.name == 'garage:list' and res and res.ok and res.data and res.data.vehicles then
         for _, v in ipairs(res.data.vehicles) do
-            v.label = vehicleLabel(v.model, v.hash)
+            v.label, v.image = vehicleLabel(v.model, v.hash)
         end
+    end
+    if req.name == 'garage:keys' and res and res.ok and res.data and res.data.shared then
+        for _, v in ipairs(res.data.shared) do
+            v.label, v.image = vehicleLabel(v.model, v.hash)
+        end
+    end
+    local relay = res and res.ok and type(res.data) == 'table' and res.data.relay
+    if relay and RELAYS[relay.event] and type(relay.args) == 'table' then
+        TriggerServerEvent(relay.event, table.unpack(relay.args))
+        res.data.relay = nil
     end
     cb(res ~= nil and res or { ok = false, error = 'timeout' })
 end)
@@ -197,9 +250,40 @@ RegisterNUICallback('callMute', function(data, cb)
     cb({ ok = true })
 end)
 
-RegisterNUICallback('setWaypoint', function(data, cb)
+local function areaLabel(x, y, z)
+    local streetHash = GetStreetNameAtCoord(x, y, z)
+    local street = streetHash and streetHash ~= 0 and GetStreetNameFromHashKey(streetHash) or ''
+    local zone = GetLabelText(GetNameOfZone(x, y, z))
+    if zone == 'NULL' then zone = '' end
+    if street ~= '' and zone ~= '' then return street .. ', ' .. zone end
+    return street ~= '' and street or zone
+end
+
+RegisterNUICallback('mapSelf', function(_, cb)
+    local ped = PlayerPedId()
+    local c = GetEntityCoords(ped)
+    cb({ ok = true, x = c.x, y = c.y, heading = GetEntityHeading(ped), label = areaLabel(c.x, c.y, c.z) })
+end)
+
+local function mapXY(data)
     local x, y = tonumber(data and data.x), tonumber(data and data.y)
-    if x and y then SetNewWaypoint(x, y) end
+    if not x or not y or x ~= x or y ~= y then return nil end
+    return x + 0.0, y + 0.0
+end
+
+RegisterNUICallback('mapStreet', function(data, cb)
+    local x, y = mapXY(data)
+    if not x then
+        cb({ ok = false })
+        return
+    end
+    local found, z = GetGroundZFor_3dCoord(x, y, 1000.0, false)
+    cb({ ok = true, label = areaLabel(x, y, found and z or 30.0) })
+end)
+
+RegisterNUICallback('setWaypoint', function(data, cb)
+    local x, y = mapXY(data)
+    if x then SetNewWaypoint(x, y) end
     cb({ ok = x ~= nil })
 end)
 

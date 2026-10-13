@@ -25,9 +25,11 @@
 
         content.append(ui.group([
             ui.row({
-                icon: ui.avatar(PhoneOS.state.number, 28),
+                icon: ui.avatar(PhoneOS.state.number, 28, PhoneOS.state.photo || null),
                 text: 'My Card',
-                value: PhoneOS.state.number,
+                value: PhoneOS.state.photo ? PhoneOS.state.number : 'Add your photo',
+                chevron: true,
+                onTap: () => PhoneOS.editMyPhoto(() => listScreen(view)),
             }),
             ui.row({ text: 'Share My Number', chevron: true, onTap: () => dropScreen(view) }),
         ]));
@@ -52,7 +54,7 @@
             const contactRow = (c) => {
                 const r = document.createElement('div');
                 r.className = 'contact-row';
-                r.append(ui.avatar(c.name, 40, c.avatar));
+                r.append(ui.avatar(c.name, 40, c.avatar || c.photo || null));
 
                 const info = document.createElement('div');
                 info.className = 'cr-info';
@@ -103,7 +105,7 @@
 
         const hero = document.createElement('div');
         hero.className = 'contact-hero';
-        hero.append(ui.avatar(contact.name, 84, contact.avatar));
+        hero.append(ui.avatar(contact.name, 84, contact.avatar || contact.photo || null));
         const name = document.createElement('div');
         name.className = 'ch-name';
         name.textContent = contact.name;

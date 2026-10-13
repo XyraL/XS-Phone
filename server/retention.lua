@@ -14,6 +14,9 @@ local function sweep()
     purge('phone_calls', 'started_at', r.calls)
     purge('phone_emails', 'created_at', r.mail)
     purge('phone_transactions', 'created_at', r.transactions)
+    purge('phone_news', 'created_at', r.news)
+    purge('phone_crypto_tx', 'created_at', r.transactions)
+    purge('phone_bills', 'created_at', r.transactions)
 
     if r.messages and r.messages > 0 then
         local empty = MySQL.query.await([[

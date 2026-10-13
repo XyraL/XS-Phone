@@ -35,6 +35,7 @@
         PhoneOS.island.clear('music');
     }
     PhoneOS.musicStop = stop;
+    PhoneOS.musicNow = () => playing;
 
     function paintIsland() {
         if (!playing) { PhoneOS.island.clear('music'); return; }

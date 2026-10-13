@@ -5,6 +5,7 @@
     --frame-radius: 54px;
     --screen-radius: 44px;
     --frame-color: #1a1a1c;
+    --frame-edge: #333;
 
     --accent: #0a84ff;
     --green: #30d158;
@@ -54,15 +55,15 @@ body.dev {
     background: radial-gradient(1200px 800px at 30% 20%, #23262e, #0c0d10);
 }
 
-.wp-aurora   { background: linear-gradient(160deg, #0f2027 0%, #203a43 30%, #2c5364 60%, #4ca1af 100%); }
-.wp-sunset   { background: linear-gradient(165deg, #1a0533 0%, #6f1d46 45%, #c94b4b 80%, #f2994a 100%); }
-.wp-ocean    { background: linear-gradient(170deg, #000428 0%, #004e92 100%); }
-.wp-graphite { background: linear-gradient(160deg, #16161a 0%, #2b2b31 55%, #3a3a42 100%); }
-.wp-xyral    { background: linear-gradient(160deg, #10151a 0%, #14343a 45%, #0f6b6b 75%, #d98e2b 130%); }
-.wp-midnight { background: linear-gradient(170deg, #05060f 0%, #0b1030 60%, #1b2560 100%); }
-.wp-rose     { background: linear-gradient(160deg, #2b0a1a 0%, #7a1f4d 55%, #ff5e8a 110%); }
-.wp-emerald  { background: linear-gradient(160deg, #04120c 0%, #0c3a26 55%, #1f8a5a 110%); }
-.wp-gold     { background: linear-gradient(160deg, #171106 0%, #4d3608 55%, #c99a2e 115%); }
+.frame-midnight { --frame-color: #1a1a1c; --frame-edge: #333; }
+.frame-titanium { --frame-color: linear-gradient(145deg, #a39e94, #6f6b64 55%, #8b867d); --frame-edge: #8b867d; }
+.frame-silver   { --frame-color: linear-gradient(145deg, #f0f0f2, #c4c4c9 55%, #dedee2); --frame-edge: #cfcfd4; }
+.frame-gold     { --frame-color: linear-gradient(145deg, #f3e3c3, #c9a974 55%, #e6cfa3); --frame-edge: #d7bb8a; }
+.frame-blue     { --frame-color: linear-gradient(145deg, #3d5f82, #1f3550 55%, #33506f); --frame-edge: #2d4865; }
+.frame-purple   { --frame-color: linear-gradient(145deg, #5f4b78, #362a4d 55%, #4f3f66); --frame-edge: #46385c; }
+.frame-red      { --frame-color: linear-gradient(145deg, #d2283f, #7c0d1f 55%, #b01a30); --frame-edge: #a3172b; }
+.frame-green    { --frame-color: linear-gradient(145deg, #50695a, #2b3d32 55%, #44594c); --frame-edge: #3b5043; }
+.frame-pink     { --frame-color: linear-gradient(145deg, #f6d9e0, #d4a6b2 55%, #ebc4ce); --frame-edge: #dfb5bf; }
 
 .accent-blue   { --accent: #0a84ff; }
 .accent-teal   { --accent: #2ec8c8; }

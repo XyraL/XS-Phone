@@ -188,6 +188,55 @@
 .co-red svg { transform: rotate(135deg); }
 .co-btn-label { font-size: 12px; opacity: 0.75; }
 
+#call-overlay.co-group { padding-top: 84px; }
+.co-stack { display: flex; justify-content: center; margin-bottom: 16px; }
+.co-stack-av { border: 3px solid #141418; margin-left: -18px; }
+.co-stack-av:first-child { margin-left: 0; }
+#call-overlay.co-group .co-name {
+    font-size: 20px;
+    text-align: center;
+    line-height: 1.25;
+    max-width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.co-with { font-size: 13px; opacity: 0.6; margin-top: 4px; text-align: center; }
+.co-members {
+    width: 100%;
+    margin-top: 18px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    padding: 2px 12px;
+    max-height: 176px;
+    overflow-y: auto;
+}
+.co-member { display: flex; align-items: center; gap: 10px; padding: 7px 0; }
+.co-member + .co-member { border-top: 1px solid rgba(255, 255, 255, 0.07); }
+.co-member-name {
+    flex: 1;
+    min-width: 0;
+    font-size: 14.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.co-member-state { font-size: 12.5px; opacity: 0.6; }
+.co-member.ringing .ui-avatar { opacity: 0.55; }
+.co-member.ringing .co-member-state { animation: copulse 1.4s ease-in-out infinite; }
+@keyframes copulse { 50% { opacity: 0.2; } }
+.co-notice { min-height: 18px; margin-top: 12px; font-size: 13px; color: #ffd60a; text-align: center; }
+.co-grid {
+    margin-top: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 66px);
+    gap: 16px 30px;
+    justify-content: center;
+}
+.co-grid + .co-actions { margin-top: 24px; }
+
 .pin-overlay {
     position: absolute;
     inset: 0;

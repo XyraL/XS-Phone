@@ -5,7 +5,7 @@ lua54 'yes'
 name 'XS-Phone'
 author 'XyraL'
 description 'iPhone-style smartphone for QBox/QBCore.'
-version '1.1.2'
+version '2.0.0'
 
 dependencies {
     'ox_lib',
@@ -24,12 +24,16 @@ client_scripts {
     'client/drop.lua',
     'client/calls.lua',
     'client/camera.lua',
+    'client/garage.lua',
     'client/nui.lua',
 }
 
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
     'bridge/framework.lua',
+    'bridge/banking.lua',
+    'bridge/billing.lua',
+    'bridge/housing.lua',
     'server/db.lua',
     'server/retention.lua',
     'server/main.lua',
@@ -50,6 +54,12 @@ server_scripts {
     'server/apps/garage.lua',
     'server/apps/music.lua',
     'server/apps/match.lua',
+    'server/apps/maps.lua',
+    'server/apps/news.lua',
+    'server/apps/crypto.lua',
+    'server/apps/bills.lua',
+    'server/apps/home.lua',
+    'server/apps/profile.lua',
 }
 
 ui_page 'html/index.html'
@@ -59,4 +69,8 @@ files {
     'html/css/*.css',
     'html/js/os/*.js',
     'html/js/apps/*.js',
+    'html/vendor/leaflet/*.js',
+    'html/vendor/leaflet/*.css',
+    'html/assets/maps/tiles/*.webp',
+    'html/fonts/*.woff2',
 }

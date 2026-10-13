@@ -32,6 +32,7 @@
         view.append(skel);
         await PhoneOS.loadContacts();
         const threads = await loadThreads();
+        await PhoneOS.loadPhotos(threads.flatMap((t) => (t.isGroup ? [] : (t.others || []))));
         if (!fresh()) return;
         skel.remove();
 
@@ -64,7 +65,7 @@
 
                 const preview = document.createElement('div');
                 preview.className = 'tr-preview';
-                const previewText = t.lastBody || (t.lastMedia ? '📷 Photo' : '');
+                const previewText = t.lastBody || (t.lastMedia ? '📷 Photo' : (t.lastLocation ? '📍 Location' : ''));
                 preview.textContent = previewText
                     ? (t.lastSender === me ? 'You: ' : '') + previewText
                     : 'No messages yet';
@@ -173,7 +174,8 @@
                 }
 
                 const b = document.createElement('div');
-                b.className = 'bubble' + (m.media ? ' bubble-media' : '');
+                b.className = 'bubble' + (m.media ? ' bubble-media' : '') + (m.location ? ' bubble-loc' : '');
+                if (m.location) b.append(locationCard(m));
                 if (m.media) {
                     const img = document.createElement('img');
                     img.className = 'bubble-img';
@@ -232,7 +234,7 @@
         bar.className = 'chat-inputbar';
         const attach = document.createElement('button');
         attach.className = 'chat-attach';
-        attach.innerHTML = PhoneOS.glyphs.camera;
+        attach.innerHTML = '<svg viewBox="0 0 24 24"><path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7z"/></svg>';
         const input = ui.textInput({ placeholder: 'Text Message' });
         input.classList.add('chat-input');
         const send = document.createElement('button');
@@ -244,9 +246,9 @@
         bar.append(attach, input, send);
         view.append(bar);
 
-        async function doSend(mediaUrl) {
+        async function doSend(mediaUrl, location) {
             const body = input.value.trim();
-            if (!body && !mediaUrl) return;
+            if (!body && !mediaUrl && !location) return;
             if (PhoneOS.state.settings.airplane) {
                 PhoneOS.notify({ app: 'settings', title: 'Airplane Mode', body: 'Turn it off to send messages.' });
                 return;
@@ -254,6 +256,7 @@
             send.disabled = true;
             const payload = thread ? { threadId: thread.id, body } : { to: composeTo, body };
             if (mediaUrl) payload.mediaUrl = mediaUrl;
+            if (location) payload.location = location;
             const res = await PhoneOS.api('messages:send', payload);
             send.disabled = false;
 
@@ -276,10 +279,16 @@
             renderAll();
         }
         send.addEventListener('click', () => doSend());
-        attach.addEventListener('click', async () => {
-            const photo = await PhoneOS.pickPhoto();
-            if (photo) doSend(photo.url);
-        });
+        attach.addEventListener('click', () => attachMenu(view, {
+            photo: async () => {
+                const photo = await PhoneOS.pickPhoto();
+                if (photo) doSend(photo.url);
+            },
+            location: async () => {
+                const self = await PhoneOS.nui('mapSelf');
+                doSend(null, { mine: true, label: (self && self.label) || '' });
+            },
+        }));
         input.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSend(); });
         input.focus();
 
@@ -288,6 +297,64 @@
             renderAll();
             PhoneOS.api('messages:markRead', { threadId: activeThreadId });
         };
+    }
+
+    function locationCard(m) {
+        const loc = m.location;
+        const card = document.createElement('div');
+        card.className = 'loc-card';
+        card.append(PhoneOS.geo.thumb(loc.x, loc.y, 220, 118));
+        const cap = document.createElement('div');
+        cap.className = 'loc-cap';
+        const title = document.createElement('div');
+        title.className = 'loc-title';
+        const sub = document.createElement('div');
+        sub.className = 'loc-sub';
+        if (loc.live) {
+            title.textContent = m.sender === me ? 'My Location' : PhoneOS.resolveName(m.sender) + '’s Location';
+            sub.textContent = loc.label || 'Current location';
+        } else {
+            title.textContent = loc.label || 'Pinned Location';
+            sub.textContent = 'Pinned location';
+        }
+        cap.append(title, sub);
+        card.append(cap);
+        card.addEventListener('click', () => PhoneOS.router.openApp('maps', null, {
+            pin: { x: loc.x, y: loc.y, label: loc.label, live: !!loc.live,
+                sender: m.sender === me ? null : m.sender, at: m.sentAt },
+        }));
+        return card;
+    }
+
+    function attachMenu(view, actions) {
+        const overlay = document.createElement('div');
+        overlay.className = 'picker-overlay';
+        const sheet = document.createElement('div');
+        sheet.className = 'picker-sheet attach-sheet';
+        const opt = (glyph, text, fn) => {
+            const b = document.createElement('button');
+            b.className = 'attach-opt';
+            const ic = document.createElement('div');
+            ic.className = 'attach-ic';
+            ic.innerHTML = glyph;
+            const l = document.createElement('div');
+            l.textContent = text;
+            b.append(ic, l);
+            b.addEventListener('click', () => { overlay.remove(); fn(); });
+            return b;
+        };
+        sheet.append(
+            opt(PhoneOS.glyphs.gallery, 'Photos', actions.photo),
+            opt(PhoneOS.geo.icon('pin'), 'Share My Location', actions.location),
+        );
+        const cancel = document.createElement('button');
+        cancel.className = 'confirm-btn';
+        cancel.textContent = 'Cancel';
+        cancel.addEventListener('click', () => overlay.remove());
+        sheet.append(cancel);
+        overlay.append(sheet);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        document.getElementById('phone-screen').append(overlay);
     }
 
     function optionsScreen(view, thread) {
@@ -464,7 +531,8 @@
         PhoneOS.notify({
             app: 'messages',
             title: PhoneOS.resolveName(data.message.sender),
-            body: data.message.body,
+            body: data.message.body
+                || (data.message.location ? 'Shared a location' : (data.message.media ? 'Sent a photo' : '')),
         });
         PhoneOS.data.threads = null; // stale — refetch on next open
     });

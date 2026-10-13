@@ -85,6 +85,19 @@ if IS_SERVER then
         }
     end
 
+    function Framework.JobLabel(name)
+        local ok, label = pcall(function()
+            if Framework.name == 'qbox' then
+                local job = exports.qbx_core:GetJob(name)
+                return job and job.label
+            elseif Framework.name == 'qbcore' then
+                local job = Framework.core.Shared.Jobs[name]
+                return job and job.label
+            end
+        end)
+        return ok and label or nil
+    end
+
     function Framework.HasItem(src, item)
         if GetResourceState('ox_inventory') == 'started' then
             local count = exports.ox_inventory:Search(src, 'count', item)

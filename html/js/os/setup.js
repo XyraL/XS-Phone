@@ -76,7 +76,19 @@ PhoneOS.setup = (() => {
             dots.append(dot);
         }
 
-        box.append(seg, dots, nextButton('Continue', stepWallpaper));
+        const finishes = el('div', 'accent-dots setup-accents setup-finishes');
+        for (const f of PhoneOS.themeOptions.finishes) {
+            const dot = el('div', `accent-dot finish-dot frame-${f.id}` + ((s.frame || 'midnight') === f.id ? ' selected' : ''));
+            dot.title = f.name;
+            dot.addEventListener('click', () => {
+                s.frame = f.id;
+                PhoneOS.shell.applySettings();
+                [...finishes.children].forEach((c) => c.classList.toggle('selected', c === dot));
+            });
+            finishes.append(dot);
+        }
+
+        box.append(seg, dots, finishes, nextButton('Continue', stepWallpaper));
     }
 
     function stepWallpaper() {

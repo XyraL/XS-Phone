@@ -12,13 +12,22 @@
     <link rel="stylesheet" href="css/apps-social.css">
     <link rel="stylesheet" href="css/apps-extra.css">
     <link rel="stylesheet" href="css/apps-platform.css">
+    <link rel="stylesheet" href="css/apps-city.css">
+    <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+    <link rel="stylesheet" href="css/ios26.css">
 </head>
 <body>
     <div id="phone-root" class="hidden">
         <div id="phone-frame">
-            <div class="side-btn btn-power"></div>
-            <div class="side-btn btn-vol-up"></div>
-            <div class="side-btn btn-vol-down"></div>
+            <div class="hw-btn hw-action"></div>
+            <div class="hw-btn hw-vol-up"></div>
+            <div class="hw-btn hw-vol-down"></div>
+            <div class="hw-btn hw-power btn-power"></div>
+            <div class="hw-btn hw-camctl"></div>
+            <div class="hw-band band-tl"></div>
+            <div class="hw-band band-tr"></div>
+            <div class="hw-band band-bl"></div>
+            <div class="hw-band band-br"></div>
 
             <div id="phone-screen" class="wp-aurora theme-dark">
                 <div class="island"></div>
@@ -26,16 +35,19 @@
                 <div id="statusbar">
                     <span id="sb-time">9:41</span>
                     <div class="sb-right">
-                        <svg class="sb-signal" viewBox="0 0 18 12" width="18" height="12">
+                        <svg class="sb-signal" viewBox="0 0 18 12" width="17" height="11">
                             <rect x="0"  y="8" width="3" height="4"  rx="1"></rect>
                             <rect x="5"  y="5" width="3" height="7"  rx="1"></rect>
                             <rect x="10" y="2" width="3" height="10" rx="1"></rect>
                             <rect x="15" y="0" width="3" height="12" rx="1"></rect>
                         </svg>
-                        <svg class="sb-battery" viewBox="0 0 27 12" width="27" height="12">
-                            <rect x="0" y="0" width="23" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-opacity="0.4" stroke-width="1"></rect>
-                            <rect id="sb-batt-fill" x="2" y="2" width="19" height="8" rx="2"></rect>
-                            <rect x="24" y="4" width="2.5" height="4" rx="1" opacity="0.4"></rect>
+                        <svg class="sb-wifi" viewBox="0 0 16 12" width="15" height="11">
+                            <path d="M8 2.2c2.4 0 4.6.9 6.3 2.5l1.2-1.3A10.7 10.7 0 0 0 8 .4C5.2.4 2.5 1.5.5 3.4l1.2 1.3A8.9 8.9 0 0 1 8 2.2zm0 3.5c1.5 0 2.9.6 4 1.6l1.2-1.3A7.4 7.4 0 0 0 8 3.9c-1.9 0-3.8.8-5.2 2.1L4 7.3a5.6 5.6 0 0 1 4-1.6zm0 3.4c.6 0 1.2.2 1.6.6L8 11.6 6.4 9.7c.4-.4 1-.6 1.6-.6z"></path>
+                        </svg>
+                        <svg class="sb-battery" viewBox="0 0 27 12" width="26" height="12">
+                            <rect x="0" y="0" width="23" height="12" rx="3.8" fill="none" stroke="currentColor" stroke-opacity="0.4" stroke-width="1"></rect>
+                            <rect id="sb-batt-fill" x="2" y="2" width="19" height="8" rx="2.2"></rect>
+                            <rect x="24" y="4" width="2.2" height="4" rx="1" opacity="0.4"></rect>
                         </svg>
                     </div>
                 </div>
@@ -50,18 +62,25 @@
                     <div class="ls-clock">
                         <div id="ls-date">Monday, September 1</div>
                         <div id="ls-time">9:41</div>
+                        <div id="ls-widgets"></div>
                     </div>
+                    <div id="ls-activity"></div>
                     <div id="ls-notifs"></div>
-                    <div class="ls-hint">Swipe up to unlock</div>
-                    <div id="ls-camera" title="Camera">
-                        <svg viewBox="0 0 24 24"><path d="M9 4l-1.2 2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2.8L15 4H9zm3 4.5A4.5 4.5 0 1 1 12 17.5 4.5 4.5 0 0 1 12 8.5z"/></svg>
+                    <div class="ls-bottom">
+                        <div id="ls-torch" class="ls-btn lg" title="Torch">
+                            <svg viewBox="0 0 24 24"><path d="M8.5 2h7v3.2l-1.4 2.6V22h-4.2V7.8L8.5 5.2V2zm3.5 9.2a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6z"/></svg>
+                        </div>
+                        <div class="ls-hint">Swipe up to open</div>
+                        <div id="ls-camera" class="ls-btn lg" title="Camera">
+                            <svg viewBox="0 0 24 24"><path d="M9 4l-1.2 2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2.8L15 4H9zm3 4.5A4.5 4.5 0 1 1 12 17.5 4.5 4.5 0 0 1 12 8.5z"/></svg>
+                        </div>
                     </div>
                 </div>
 
                 <div id="homescreen" class="hidden">
-                    <div id="widgets"></div>
-                    <div id="app-grid"></div>
-                    <div id="dock"></div>
+                    <div id="home-pages"><div id="home-track"></div></div>
+                    <button id="home-search" class="lg" type="button"></button>
+                    <div id="dock" class="lg"></div>
                 </div>
 
                 <div id="app-layer" class="hidden"></div>
@@ -92,6 +111,10 @@
     <script src="js/os/island.js"></script>
     <script src="js/os/controlcenter.js"></script>
     <script src="js/os/spotlight.js"></script>
+    <script src="js/os/geo.js"></script>
+    <script src="js/os/glass.js"></script>
+    <script src="js/os/icons.js"></script>
+    <script src="vendor/leaflet/leaflet.js"></script>
 
     <script src="js/apps/phone.js"></script>
     <script src="js/apps/messages.js"></script>
@@ -112,12 +135,19 @@
     <script src="js/apps/garage.js"></script>
     <script src="js/apps/music.js"></script>
     <script src="js/apps/weather.js"></script>
+    <script src="js/apps/maps.js"></script>
+    <script src="js/apps/news.js"></script>
+    <script src="js/apps/crypto.js"></script>
+    <script src="js/apps/home.js"></script>
     <script src="js/apps/appstore.js"></script>
     <script src="js/apps/match.js"></script>
     <script src="js/apps/game2048.js"></script>
     <script src="js/apps/snake.js"></script>
     <script src="js/os/setup.js"></script>
+    <script src="js/os/home.js"></script>
+    <script src="js/os/lockscreen.js"></script>
     <script src="js/os/shell.js"></script>
     <script src="js/os/gestures.js"></script>
+    <script src="js/os/motion.js"></script>
 </body>
 </html>

@@ -9,6 +9,10 @@ function PhoneCallback(name, handler)
     end)
 end
 
+Config.Phone.DefaultSettings.frame = Config.Phone.DefaultSettings.frame or 'midnight'
+Config.Phone.DefaultSettings.homeLayout = Config.Phone.DefaultSettings.homeLayout or ''
+Config.Phone.DefaultSettings.photoShare = Config.Phone.DefaultSettings.photoShare or 'everyone'
+
 local buckets = {}
 
 function RateOK(src, action)
@@ -113,12 +117,13 @@ function EnsurePhone(src)
     if not citizenid then return nil end
 
     local row = MySQL.single.await(
-        'SELECT number, pin, settings, installed_apps FROM phone_phones WHERE citizenid = ?', { citizenid })
+        'SELECT number, pin, settings, installed_apps, photo FROM phone_phones WHERE citizenid = ?', { citizenid })
 
     local entry
     if row then
         entry = {
             number = row.number,
+            photo = row.photo,
             hasPin = row.pin ~= nil,
             settings = withDefaults(row.settings and json.decode(row.settings) or nil),
             installedApps = row.installed_apps and json.decode(row.installed_apps)
@@ -187,15 +192,27 @@ local function phonePayload(src)
         WHERE a.number = ? AND e.folder = 'inbox' AND e.is_read = 0
     ]], { phone.number }) or 0
 
+    local billsOn = Billing and #Billing.Sources() > 0
+
     return {
         number = phone.number,
         hasPin = phone.hasPin,
+        photo = phone.photo,
         settings = phone.settings,
         os = Config.Phone.Branding.osName,
         appNames = Config.Phone.AppNames,
         installedApps = phone.installedApps,
         version = GetResourceMetadata(GetCurrentResourceName(), 'version', 0) or '0.0.0',
-        badges = { messages = unread, mail = unreadMail },
+        features = {
+            home = Housing ~= nil and Housing.Name() ~= nil,
+            bills = billsOn,
+        },
+        lines = BusinessLines and BusinessLines() or {},
+        badges = {
+            messages = unread,
+            mail = unreadMail,
+            wallet = billsOn and BillCount and BillCount(phone.citizenid) or 0,
+        },
     }
 end
 
@@ -210,7 +227,7 @@ PhoneCallback('XS-Phone:phone:changeNumber', function(src)
 
     local entry = EnsurePhone(src)
     if not entry then return { ok = false, error = 'no_character' } end
-    if numberInCall and numberInCall[entry.number] then return { ok = false, error = 'busy' } end
+    if PhoneInCall and PhoneInCall(entry.number) then return { ok = false, error = 'busy' } end
 
     local cost = Config.Phone.Numbers.changeCost or 0
     if cost > 0 then
@@ -248,6 +265,7 @@ PhoneCallback('XS-Phone:phone:changeNumber', function(src)
         { 'phone_match_matches', 'b' },
         { 'phone_darkchat_members', 'number' },
         { 'phone_mail_accounts', 'number' },
+        { 'phone_places', 'owner_number' },
     }) do
         pcall(MySQL.update.await,
             ('UPDATE `%s` SET `%s` = ? WHERE `%s` = ?'):format(migration[1], migration[2], migration[2]),
@@ -330,7 +348,8 @@ PhoneCallback('XS-Phone:saveSettings', function(src, incoming)
     for key, default in pairs(Config.Phone.DefaultSettings) do
         local value = incoming[key]
         if value ~= nil and type(value) == type(default) then
-            if type(value) == 'string' and #value > 300 then value = value:sub(1, 300) end
+            local cap = key == 'homeLayout' and 2000 or 300
+            if type(value) == 'string' and #value > cap then value = value:sub(1, cap) end
             clean[key] = value
         else
             clean[key] = default

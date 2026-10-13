@@ -13,11 +13,22 @@
         { id: 'xyral',    name: 'XyraL' },
     ];
     const ACCENTS = ['blue', 'teal', 'amber', 'purple', 'green', 'rose'];
+    const FINISHES = [
+        { id: 'midnight', name: 'Midnight' },
+        { id: 'titanium', name: 'Titanium' },
+        { id: 'silver',   name: 'Silver' },
+        { id: 'gold',     name: 'Gold' },
+        { id: 'blue',     name: 'Blue' },
+        { id: 'purple',   name: 'Purple' },
+        { id: 'red',      name: 'Red' },
+        { id: 'green',    name: 'Green' },
+        { id: 'pink',     name: 'Pink' },
+    ];
     const TEXT_SCALES = [['small', 'Small'], ['default', 'Default'], ['large', 'Large']];
     const RINGTONES = ['horizon', 'classic', 'pulse'];
     const TEXTTONES = ['pop', 'chime', 'ding'];
 
-    PhoneOS.themeOptions = { wallpapers: WALLPAPERS, accents: ACCENTS };
+    PhoneOS.themeOptions = { wallpapers: WALLPAPERS, accents: ACCENTS, finishes: FINISHES };
 
     let saveTimer = null;
     function save(delay) {
@@ -52,15 +63,21 @@
 
         const hero = document.createElement('div');
         hero.className = 'settings-hero';
-        const avatar = ui.avatar(s.number || '?', 64);
+        const avatar = ui.avatar(s.number || '?', 72, s.photo || null);
         avatar.classList.add('sh-avatar');
+        avatar.title = 'Change your photo';
+        avatar.addEventListener('click', () => PhoneOS.editMyPhoto(() => mainScreen(view)));
+        const edit = document.createElement('div');
+        edit.className = 'sh-edit';
+        edit.textContent = s.photo ? 'Edit Photo' : 'Add Photo';
+        edit.addEventListener('click', () => PhoneOS.editMyPhoto(() => mainScreen(view)));
         const num = document.createElement('div');
         num.className = 'sh-number';
         num.textContent = s.number || 'No number';
         const os = document.createElement('div');
         os.className = 'sh-os';
         os.textContent = `${s.os} · your number`;
-        hero.append(avatar, num, os);
+        hero.append(avatar, edit, num, os);
 
         const segment = (key, options) => {
             const seg = document.createElement('div');
@@ -97,6 +114,10 @@
 
         content.append(
             hero,
+            ui.label('My Card'),
+            ui.group([
+                ui.row({ text: 'Shared With', control: segment('photoShare', [['everyone', 'Everyone'], ['contacts', 'Contacts']]) }),
+            ]),
             ui.label('General'),
             ui.group([
                 ui.row({ text: 'Airplane Mode', control: settingToggle('airplane') }),
@@ -109,13 +130,20 @@
             ui.group([
                 ui.row({ text: 'Theme', control: segment('theme', [['dark', 'Dark'], ['light', 'Light']]) }),
                 ui.row({ text: 'Accent', control: accents }),
+                ui.row({
+                    text: 'Phone Colour',
+                    value: (FINISHES.find((f) => f.id === s.settings.frame) || FINISHES[0]).name,
+                    chevron: true,
+                    onTap: () => finishScreen(view),
+                }),
                 ui.row({ text: 'Text Size', control: segment('textScale', TEXT_SCALES) }),
             ]),
             ui.label('Personalization'),
             ui.group([
                 ui.row({
                     text: 'Wallpaper',
-                    value: WALLPAPERS.find((w) => w.id === s.settings.wallpaper)?.name || '',
+                    value: String(s.settings.wallpaper || '').startsWith('url:') ? 'Photo'
+                        : (WALLPAPERS.find((w) => w.id === s.settings.wallpaper)?.name || ''),
                     chevron: true,
                     onTap: () => wallpaperScreen(view),
                 }),
@@ -173,6 +201,62 @@
         view.append(content);
     }
 
+    PhoneOS.editMyPhoto = function (onDone) {
+        const s = PhoneOS.state;
+        const overlay = document.createElement('div');
+        overlay.className = 'picker-overlay';
+        const sheet = document.createElement('div');
+        sheet.className = 'picker-sheet my-photo-sheet';
+        const preview = ui.avatar(s.number || '?', 96, s.photo || null);
+        preview.classList.add('mp-preview');
+        const title = document.createElement('div');
+        title.className = 'picker-title';
+        title.textContent = 'Your photo';
+        const note = document.createElement('div');
+        note.className = 'mp-note';
+        note.textContent = s.settings.photoShare === 'contacts'
+            ? 'Only people in your contacts see this when you call or text them.'
+            : 'Everyone you call or text sees this, unless they picked their own photo for you.';
+        const error = document.createElement('div');
+        error.className = 'form-error';
+        const setPhoto = async (url) => {
+            const res = await PhoneOS.api('profile:setPhoto', { url });
+            if (!res || !res.ok) {
+                error.textContent = res && res.error === 'bad_media' ? 'Pick a photo from your gallery.' : 'Couldn’t save your photo.';
+                return false;
+            }
+            s.photo = res.data.photo || null;
+            overlay.remove();
+            if (onDone) onDone();
+            return true;
+        };
+        const choose = document.createElement('button');
+        choose.className = 'confirm-btn confirm-primary';
+        choose.textContent = s.photo ? 'Choose New Photo' : 'Choose Photo';
+        choose.addEventListener('click', async () => {
+            overlay.classList.add('hidden');
+            const photo = await PhoneOS.pickPhoto();
+            if (!photo) { overlay.classList.remove('hidden'); return; }
+            if (!await setPhoto(photo.url)) overlay.classList.remove('hidden');
+        });
+        sheet.append(preview, title, note, error, choose);
+        if (s.photo) {
+            const remove = document.createElement('button');
+            remove.className = 'confirm-btn confirm-danger';
+            remove.textContent = 'Remove Photo';
+            remove.addEventListener('click', () => setPhoto(null));
+            sheet.append(remove);
+        }
+        const cancel = document.createElement('button');
+        cancel.className = 'confirm-btn';
+        cancel.textContent = 'Cancel';
+        cancel.addEventListener('click', () => overlay.remove());
+        sheet.append(cancel);
+        overlay.append(sheet);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        document.getElementById('phone-screen').append(overlay);
+    };
+
     function wallpaperScreen(view) {
         view.textContent = '';
         view.append(ui.header('', { back: { label: 'Settings', onTap: () => mainScreen(view) } }));
@@ -182,6 +266,27 @@
 
         const grid = document.createElement('div');
         grid.className = 'wp-swatches';
+        const current = PhoneOS.state.settings.wallpaper || '';
+        const photoTile = document.createElement('div');
+        photoTile.className = 'wp-swatch wp-photo' + (current.startsWith('url:') ? ' selected' : '');
+        if (current.startsWith('url:')) {
+            photoTile.style.backgroundImage = `url("${current.slice(4).replace(/"/g, '%22')}")`;
+        } else {
+            photoTile.innerHTML = PhoneOS.glyphs.gallery;
+        }
+        const photoName = document.createElement('div');
+        photoName.className = 'wp-name';
+        photoName.textContent = current.startsWith('url:') ? 'Your Photo' : 'Choose a Photo';
+        photoTile.append(photoName);
+        photoTile.addEventListener('click', async () => {
+            const photo = await PhoneOS.pickPhoto();
+            if (!photo) return;
+            PhoneOS.state.settings.wallpaper = 'url:' + photo.url;
+            PhoneOS.shell.applySettings();
+            wallpaperScreen(view);
+            save();
+        });
+        grid.append(photoTile);
         for (const wp of WALLPAPERS) {
             const sw = document.createElement('div');
             sw.className = `wp-swatch wp-${wp.id}` +
@@ -194,6 +299,45 @@
                 PhoneOS.state.settings.wallpaper = wp.id;
                 PhoneOS.shell.applySettings();
                 wallpaperScreen(view);
+                save();
+            });
+            grid.append(sw);
+        }
+        content.append(grid);
+        view.append(content);
+    }
+
+    function finishScreen(view) {
+        view.textContent = '';
+        view.append(ui.header('', { back: { label: 'Settings', onTap: () => mainScreen(view) } }));
+
+        const s = PhoneOS.state.settings;
+        const content = ui.content();
+        content.append(ui.label('Phone colour'));
+
+        const grid = document.createElement('div');
+        grid.className = 'finish-grid';
+        for (const f of FINISHES) {
+            const sw = document.createElement('div');
+            sw.className = 'finish-swatch' + ((s.frame || 'midnight') === f.id ? ' selected' : '');
+            const phone = document.createElement('div');
+            phone.className = 'finish-phone frame-' + f.id;
+            const screen = document.createElement('div');
+            screen.className = 'finish-screen';
+            if (s.wallpaper && s.wallpaper.startsWith('url:')) {
+                screen.style.background = `url("${s.wallpaper.slice(4).replace(/"/g, '%22')}") center/cover`;
+            } else {
+                screen.classList.add('wp-' + s.wallpaper);
+            }
+            phone.append(screen);
+            const name = document.createElement('div');
+            name.className = 'finish-name';
+            name.textContent = f.name;
+            sw.append(phone, name);
+            sw.addEventListener('click', () => {
+                s.frame = f.id;
+                PhoneOS.shell.applySettings();
+                finishScreen(view);
                 save();
             });
             grid.append(sw);

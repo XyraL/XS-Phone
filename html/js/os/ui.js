@@ -5,8 +5,10 @@ PhoneOS.ui = (() => {
 
         if (opts.back) {
             const back = document.createElement('button');
-            back.className = 'ah-back';
-            back.textContent = opts.back.label || 'Back';
+            const backLabel = opts.back.label || 'Back';
+            back.className = 'ah-back' + (/^(cancel|close|done)$/i.test(backLabel) ? ' text' : '');
+            back.textContent = backLabel;
+            back.title = backLabel;
             back.addEventListener('click', opts.back.onTap);
             h.append(back);
         } else {
@@ -18,7 +20,8 @@ PhoneOS.ui = (() => {
 
         if (opts.action) {
             const btn = document.createElement('button');
-            btn.className = 'ah-action';
+            btn.className = 'ah-action' + (String(opts.action.label).length > 2 ? ' text' : '');
+            h.classList.add('has-action');
             btn.textContent = opts.action.label;
             btn.addEventListener('click', opts.action.onTap);
             h.append(btn);
@@ -236,6 +239,8 @@ PhoneOS.ui = (() => {
 })();
 
 PhoneOS.resolveName = function (number) {
+    const lines = PhoneOS.state && PhoneOS.state.lines;
+    if (lines && lines[number]) return lines[number];
     const contacts = PhoneOS.data && PhoneOS.data.contacts;
     if (!contacts) return number;
     const digits = String(number).replace(/\D/g, '');
@@ -336,12 +341,25 @@ PhoneOS.ui.authForm = function (opts) {
     return wrap;
 };
 
+PhoneOS.photos = {};
+
 PhoneOS.contactAvatar = function (number) {
     const contacts = PhoneOS.data && PhoneOS.data.contacts;
-    if (!contacts) return null;
-    const hit = contacts.find((c) => c.number === number);
-    return hit && hit.avatar ? hit.avatar : null;
+    const hit = contacts && contacts.find((c) => c.number === number);
+    if (hit && (hit.avatar || hit.photo)) return hit.avatar || hit.photo;
+    return PhoneOS.photos[number] || null;
 };
+
+PhoneOS.loadPhotos = async function (numbers) {
+    const want = [...new Set((numbers || []).filter((n) => n && n !== 'Anonymous'
+        && !(n in PhoneOS.photos) && !(PhoneOS.state && PhoneOS.state.lines && PhoneOS.state.lines[n])))];
+    if (!want.length) return;
+    const res = await PhoneOS.api('profile:photos', { numbers: want.slice(0, 60) });
+    const got = (res && res.ok && res.data) || {};
+    for (const n of want) PhoneOS.photos[n] = got[n] || null;
+};
+
+PhoneOS.on('phone:open', () => { PhoneOS.photos = {}; });
 
 PhoneOS.data = { contacts: null, threads: null };
 

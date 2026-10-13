@@ -43,7 +43,8 @@
     position: absolute;
     right: -2px;
     width: 3px;
-    background: #333;
+    background: var(--frame-edge, #333);
+    filter: brightness(0.85);
     border-radius: 2px;
 }
 .btn-power    { top: 200px; height: 64px; }

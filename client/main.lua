@@ -179,7 +179,7 @@ RegisterNetEvent('XS-Phone:client:newMessage', function(payload)
         local who = payload.fromName or msg.sender or 'New message'
         local body = msg.body
         if not body or body == '' then
-            body = msg.media and 'Sent a photo' or 'New message'
+            body = msg.location and 'Shared a location' or (msg.media and 'Sent a photo' or 'New message')
         end
         if #body > 80 then body = body:sub(1, 77) .. '...' end
         Framework.Notify(who .. ': ' .. body, 'inform')
@@ -194,69 +194,35 @@ RegisterNetEvent('XS-Phone:client:pushNotify', function(n)
     end
 end)
 
+RegisterNetEvent('XS-Phone:client:lineMessage', function(payload)
+    SendNUIMessage({ action = 'phone:lineMessage', data = payload })
+    if not phoneOpen and not quietMode() and not payload.reply then
+        local msg = payload.message or {}
+        local body = msg.body
+        if not body or body == '' then body = msg.location and 'Shared a location' or 'New message' end
+        if #body > 80 then body = body:sub(1, 77) .. '...' end
+        Framework.Notify(('%s · %s: %s'):format(payload.label or payload.line, msg.sender or '?', body), 'inform')
+        PlaySoundFrontend(-1, 'Text_Arrive_Tone', 'Phone_SoundSet_Default', true)
+    end
+end)
+
+RegisterNetEvent('XS-Phone:client:homeChanged', function()
+    SendNUIMessage({ action = 'phone:homeChanged' })
+end)
+
+RegisterNetEvent('XS-Phone:client:billsChanged', function()
+    SendNUIMessage({ action = 'phone:billsChanged' })
+end)
+
+RegisterNetEvent('qb-phone:client:AcceptorDenyInvoice', function(_, _, job, _, amount)
+    local n = { app = 'wallet', title = 'New bill', body = ('$%s from %s'):format(tonumber(amount) or 0, tostring(job or 'a business')) }
+    SendNUIMessage({ action = 'phone:notify', data = n })
+    SendNUIMessage({ action = 'phone:billsChanged' })
+    if not phoneOpen and not quietMode() then Framework.Notify(n.title .. ': ' .. n.body, 'inform') end
+end)
+
 RegisterNetEvent('XS-Phone:client:darkchat', function(payload)
     SendNUIMessage({ action = 'phone:darkchat', data = payload })
-end)
-
-RegisterNetEvent('XS-Phone:client:valetSpawn', function(data)
-    local ped = PlayerPedId()
-    local coords = GetEntityCoords(ped)
-
-    local model = type(data.model) == 'number' and data.model or joaat(tostring(data.model))
-    if not IsModelInCdimage(model) or not IsModelAVehicle(model) then
-        TriggerServerEvent('XS-Phone:valetFailed')
-        return
-    end
-    if not pcall(lib.requestModel, model, 10000) then
-        TriggerServerEvent('XS-Phone:valetFailed')
-        return
-    end
-
-    local found, nodePos, heading = GetClosestVehicleNodeWithHeading(
-        coords.x, coords.y, coords.z, 1, 3.0, 0)
-    local spawnPos
-    if found and #(nodePos - coords) < 60.0 then
-        spawnPos = nodePos
-    else
-        spawnPos = coords + GetEntityForwardVector(ped) * 5.0
-        heading = GetEntityHeading(ped)
-        local okZ, groundZ = GetGroundZFor_3dCoord(spawnPos.x, spawnPos.y, spawnPos.z + 5.0, false)
-        if okZ then spawnPos = vector3(spawnPos.x, spawnPos.y, groundZ) end
-    end
-
-    local veh = CreateVehicle(model, spawnPos.x, spawnPos.y, spawnPos.z + 0.5, heading, true, false)
-    SetModelAsNoLongerNeeded(model)
-    if veh == 0 then
-        TriggerServerEvent('XS-Phone:valetFailed')
-        return
-    end
-
-    SetVehicleNumberPlateText(veh, data.plate)
-    TriggerServerEvent('XS-Phone:valetOk', NetworkGetNetworkIdFromEntity(veh))
-
-    SetVehicleOnGroundProperly(veh)
-    SetVehicleDoorsLocked(veh, 1)
-
-    if data.mods and data.mods ~= '' then
-        local props = json.decode(data.mods)
-        if props then pcall(lib.setVehicleProperties, veh, props) end
-    end
-
-    SetVehicleEngineOn(veh, false, true, false)
-
-    local blip = AddBlipForEntity(veh)
-    SetBlipSprite(blip, 225)
-    SetBlipColour(blip, 3)
-    SetBlipFlashes(blip, true)
-    SetTimeout(20000, function()
-        if DoesBlipExist(blip) then RemoveBlip(blip) end
-    end)
-end)
-
--- Key scripts other than qbx_vehiclekeys and qb-vehiclekeys listen for the
--- old QBCore event on the client.
-RegisterNetEvent('XS-Phone:client:valetKeys', function(plate)
-    pcall(function() TriggerEvent('vehiclekeys:client:SetOwner', plate) end)
 end)
 
 AddEventHandler('onResourceStop', function(res)

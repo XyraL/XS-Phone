@@ -1,201 +1,308 @@
 (() => {
     const ui = PhoneOS.ui;
+    const G = PhoneOS.geo;
+    const GLYPH = {
+        call: '<svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z"/></svg>',
+        text: '<svg viewBox="0 0 24 24"><path d="M12 3C6.5 3 2 6.6 2 11c0 2.5 1.4 4.7 3.6 6.2-.2 1.1-.8 2.2-1.5 3 1.7-.2 3.3-.9 4.5-1.7 1.1.3 2.2.5 3.4.5 5.5 0 10-3.6 10-8S17.5 3 12 3z"/></svg>',
+        gps: '<svg viewBox="0 0 24 24"><path d="M20.5 3.5L3.6 10.7c-.6.3-.5 1.2.1 1.3l7 1.3 1.3 7c.1.7 1 .8 1.3.1l7.2-16.9z"/></svg>',
+        edit: '<svg viewBox="0 0 24 24"><path d="M4 17.2V20h2.8l8.3-8.3-2.8-2.8L4 17.2zm13.7-7.6a1 1 0 0 0 0-1.4l-1.9-1.9a1 1 0 0 0-1.4 0l-1.5 1.5 2.8 2.8 1.5-1.5z"/></svg>',
+    };
+    const CATEGORY_ICON = { Emergency: 'police', Vehicles: 'car', Transport: 'car', 'Food & Drink': 'food' };
 
-    const appTitle = () => PhoneOS.appName('services');
+    let current = null;
+
+    function el(tag, cls, text) {
+        const n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text !== undefined) n.textContent = text;
+        return n;
+    }
+
+    const title = () => PhoneOS.appName('services');
+
+    function iconButton(kind, label, onTap, disabled) {
+        const b = el('button', 'sv-ibtn ' + kind);
+        b.type = 'button';
+        b.title = label;
+        b.innerHTML = GLYPH[kind];
+        b.disabled = !!disabled;
+        b.addEventListener('click', (e) => { e.stopPropagation(); onTap(); });
+        return b;
+    }
+
+    async function gps(biz) {
+        const res = await PhoneOS.nui('setWaypoint', { x: biz.x, y: biz.y });
+        PhoneOS.notify({ app: 'services', title: title(), body: res && res.ok ? `GPS set to ${biz.label}.` : 'Couldn’t set the GPS.' });
+    }
+
+    function actionSheet(biz) {
+        const overlay = el('div', 'picker-overlay');
+        const sheet = el('div', 'picker-sheet sv-sheet');
+        const head = el('div', 'sv-sheet-head');
+        head.append(el('div', 'sv-sheet-num', biz.number), el('div', 'sv-sheet-label', biz.label),
+            el('div', 'sv-sheet-state ' + (biz.open ? 'on' : 'off'), biz.open ? `${biz.onDuty} on duty` : 'Nobody on duty'));
+        sheet.append(head);
+        const btn = (text, cls, fn) => {
+            const b = el('button', 'confirm-btn ' + cls, text);
+            b.addEventListener('click', () => { overlay.remove(); fn(); });
+            sheet.append(b);
+        };
+        btn(`Call ${biz.number}`, 'confirm-primary sv-call', () => PhoneOS.startCall(biz.number));
+        btn(`Text ${biz.number}`, '', () => PhoneOS.router.openApp('messages', null, { composeTo: biz.number }));
+        if (typeof biz.x === 'number') btn('Set GPS', '', () => gps(biz));
+        btn('Cancel', '', () => {});
+        overlay.append(sheet);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        document.getElementById('phone-screen').append(overlay);
+    }
+
+    function emergencyTile(biz) {
+        const t = el('button', 'sv-sos ' + (biz.job === 'police' ? 'pd' : 'ems'));
+        t.type = 'button';
+        const icon = el('div', 'sv-sos-ic');
+        icon.innerHTML = G.icon(biz.job === 'police' ? 'police' : 'hospital');
+        t.append(icon, el('div', 'sv-sos-num', biz.number), el('div', 'sv-sos-label', biz.label),
+            el('div', 'sv-sos-state', biz.open ? `${biz.onDuty} on duty` : 'Nobody on duty'));
+        t.addEventListener('click', () => actionSheet(biz));
+        return t;
+    }
+
+    function bizRow(view, biz) {
+        const r = el('div', 'sv-row');
+        const ic = el('div', 'sv-row-ic');
+        const kind = CATEGORY_ICON[biz.category] || 'work';
+        ic.style.background = G.tint(kind);
+        ic.innerHTML = G.icon(kind);
+        const info = el('div', 'sv-row-info');
+        const top = el('div', 'sv-row-top');
+        top.append(el('span', 'sv-row-name', biz.label), el('span', 'sv-pill ' + (biz.open ? 'open' : 'closed'), biz.open ? 'Open' : 'Closed'));
+        const sub = el('div', 'sv-row-sub', (biz.open ? `${biz.onDuty} working` : 'Nobody on duty') + (biz.number ? ` · ${biz.number}` : ''));
+        info.append(top, sub);
+        if (biz.announcement) info.append(el('div', 'sv-ann', biz.announcement));
+        const actions = el('div', 'sv-row-actions');
+        if (biz.number) {
+            actions.append(iconButton('call', 'Call', () => PhoneOS.startCall(biz.number), !biz.open));
+            actions.append(iconButton('text', 'Text', () => PhoneOS.router.openApp('messages', null, { composeTo: biz.number })));
+        }
+        if (typeof biz.x === 'number') actions.append(iconButton('gps', 'GPS', () => gps(biz)));
+        if (biz.isBoss) actions.append(iconButton('edit', 'Announcement', () => announcementSheet(view, biz)));
+        r.append(ic, info, actions);
+        return r;
+    }
 
     async function render(view) {
+        current = null;
         const fresh = PhoneOS.freshRender(view);
         view.textContent = '';
-        view.append(ui.header(appTitle()));
-
-        const content = ui.content();
+        view.append(ui.header(title()));
+        const skel = ui.skeleton(5);
+        view.append(skel);
         const res = await PhoneOS.api('city:list');
         if (!fresh()) return;
+        skel.remove();
         const entries = (res && res.ok && res.data) || [];
+        const lines = (res && res.lines) || [];
+        const content = ui.content();
 
-        if (!entries.length) {
-            const empty = document.createElement('div');
-            empty.className = 'empty-state';
-            empty.textContent = 'Nothing listed yet.';
-            content.append(empty);
-            view.append(content);
-            return;
+        if (lines.length) {
+            content.append(ui.label('Your line'));
+            for (const l of lines) {
+                const card = el('button', 'sv-line');
+                card.type = 'button';
+                const ic = el('div', 'sv-line-ic');
+                ic.innerHTML = GLYPH.text;
+                const body = el('div', 'sv-line-body');
+                body.append(el('div', 'sv-line-title', l.label),
+                    el('div', 'sv-line-sub', `${l.number} · on duty · ${l.chats} conversation${l.chats === 1 ? '' : 's'}`));
+                card.append(ic, body, el('div', 'row-chevron'));
+                card.addEventListener('click', () => lineInbox(view, l));
+                content.append(card);
+            }
         }
 
-        const emergencies = entries.filter((e) => e.emergency && e.number);
-        if (emergencies.length) {
-            const panel = document.createElement('div');
-            panel.className = 'city-911';
-            const label = document.createElement('div');
-            label.className = 'city-911-label';
-            label.textContent = 'Emergency';
-            const row = document.createElement('div');
-            row.className = 'city-911-row';
-            for (const e of emergencies) {
-                const btn = document.createElement('button');
-                btn.className = 'city-911-btn';
-                const big = document.createElement('div');
-                big.className = 'c9-big';
-                big.textContent = e.number;
-                const sub = document.createElement('div');
-                sub.className = 'c9-sub';
-                sub.textContent = `${e.label} · ${e.onDuty} on duty`;
-                btn.append(big, sub);
-                btn.addEventListener('click', () => emergencySheet(e));
-                row.append(btn);
-            }
-            panel.append(label, row);
-            content.append(panel);
+        const sos = entries.filter((e) => e.emergency && e.number);
+        if (sos.length) {
+            content.append(ui.label('Emergency'));
+            const grid = el('div', 'sv-sos-grid');
+            for (const e of sos) grid.append(emergencyTile(e));
+            content.append(grid);
         }
 
         const byCategory = {};
-        for (const e of entries.filter((x) => !x.emergency)) {
+        for (const e of entries.filter((x) => !(x.emergency && x.number))) {
             (byCategory[e.category] = byCategory[e.category] || []).push(e);
         }
-
         for (const [category, list] of Object.entries(byCategory)) {
             content.append(ui.label(category));
-            content.append(ui.group(list.map((biz) => bizRow(view, biz))));
+            const group = el('div', 'list-group sv-group');
+            for (const biz of list) group.append(bizRow(view, biz));
+            content.append(group);
+        }
+        if (!entries.length) content.append(el('div', 'empty-state', 'Nothing listed yet.'));
+        view.append(content);
+    }
+
+    function preview(t) {
+        if (t.lastBody) return t.lastBody;
+        if (t.lastLocation) return '📍 Location';
+        if (t.lastMedia) return '📷 Photo';
+        return 'No messages';
+    }
+
+    async function lineInbox(view, line) {
+        current = { view, line, threadId: null };
+        const fresh = PhoneOS.freshRender(view);
+        view.textContent = '';
+        view.append(ui.header(`${line.number}`, { back: { label: 'Back', onTap: () => render(view) } }));
+        const content = ui.content();
+        content.append(el('div', 'sv-inbox-head', `${line.label} line · everyone on duty sees these`));
+        const res = await PhoneOS.api('line:threads', { number: line.number });
+        if (!fresh()) return;
+        await PhoneOS.loadContacts();
+        if (!fresh()) return;
+        if (!res || !res.ok) {
+            content.append(el('div', 'empty-state', res && res.error === 'off_duty' ? 'You need to be on duty to see this line.' : 'Couldn’t load the line.'));
+            view.append(content);
+            return;
+        }
+        const threads = res.data.threads || [];
+        await PhoneOS.loadPhotos(threads.map((t) => t.caller));
+        if (!fresh()) return;
+        if (!threads.length) {
+            content.append(el('div', 'empty-state', 'No messages on this line yet.'));
+        } else {
+            const group = el('div', 'list-group');
+            for (const t of threads) {
+                const row = el('div', 'thread-row sv-thread');
+                const name = PhoneOS.resolveName(t.caller || 'Unknown');
+                row.append(ui.avatar(name, 42, t.caller ? PhoneOS.contactAvatar(t.caller) : null));
+                const info = el('div', 'tr-info');
+                const top = el('div', 'tr-top');
+                top.append(el('div', 'tr-name', name), el('div', 'tr-when', ui.fmtWhen(t.lastAt) + ' ›'));
+                const pv = el('div', 'tr-preview', (t.lastSender === line.number ? 'You: ' : '') + preview(t));
+                info.append(top, pv);
+                row.append(info);
+                row.addEventListener('click', () => lineChat(view, line, t.id, t.caller));
+                group.append(row);
+            }
+            content.append(group);
         }
         view.append(content);
     }
 
-    function bizRow(view, biz) {
-        const r = document.createElement('div');
-        r.className = 'service-row';
-
-        const info = document.createElement('div');
-        info.className = 'sr-info';
-        const top = document.createElement('div');
-        top.className = 'biz-top';
-        const name = document.createElement('span');
-        name.className = 'sr-name';
-        name.textContent = biz.label;
-        const chip = document.createElement('span');
-        chip.className = 'biz-chip ' + (biz.open ? 'biz-open' : 'biz-closed');
-        chip.textContent = biz.open ? 'OPEN' : 'CLOSED';
-        top.append(name, chip);
-
-        const sub = document.createElement('div');
-        sub.className = 'sr-sub';
-        sub.textContent = biz.open
-            ? `${biz.onDuty} working right now` : 'Nobody on duty';
-        if (biz.number) sub.textContent += ` · ${biz.number}`;
-        info.append(top, sub);
-
-        if (biz.announcement) {
-            const ann = document.createElement('div');
-            ann.className = 'biz-announcement';
-            ann.textContent = biz.announcement;
-            info.append(ann);
-        }
-        r.append(info);
-
-        const actions = document.createElement('div');
-        actions.className = 'sr-actions';
-
-        if (biz.number) {
-            const call = document.createElement('button');
-            call.className = 'contact-action';
-            call.textContent = 'Call';
-            call.disabled = !biz.open;
-            call.addEventListener('click', () => PhoneOS.startCall(biz.number));
-
-            const text = document.createElement('button');
-            text.className = 'contact-action';
-            text.textContent = 'Text';
-            text.disabled = !biz.open;
-            text.addEventListener('click', () =>
-                PhoneOS.router.openApp('messages', null, { composeTo: biz.number }));
-
-            actions.append(call, text);
-        }
-
-        if (biz.isBoss) {
-            const edit = document.createElement('button');
-            edit.className = 'contact-action';
-            edit.textContent = '✎';
-            edit.title = 'Set announcement';
-            edit.addEventListener('click', () => announcementSheet(view, biz));
-            actions.append(edit);
-        }
-        r.append(actions);
-        return r;
-    }
-
-    function emergencySheet(e) {
-        const overlay = document.createElement('div');
-        overlay.className = 'picker-overlay';
-        const sheet = document.createElement('div');
-        sheet.className = 'picker-sheet';
-
-        const title = document.createElement('div');
-        title.className = 'picker-title';
-        title.textContent = `${e.label} · ${e.number}`;
-
-        const call = document.createElement('button');
-        call.className = 'confirm-btn confirm-primary';
-        call.textContent = `Call ${e.number}`;
+    async function lineChat(view, line, threadId, caller) {
+        current = { view, line, threadId };
+        const fresh = PhoneOS.freshRender(view);
+        view.textContent = '';
+        const name = PhoneOS.resolveName(caller || 'Unknown');
+        const head = el('div', 'imsg-head');
+        const back = el('button', 'ah-back', 'Back');
+        back.addEventListener('click', () => lineInbox(view, line));
+        const center = el('div', 'imsg-head-center');
+        center.append(ui.avatar(name, 40, caller ? PhoneOS.contactAvatar(caller) : null), el('div', 'imsg-head-name', `${name} · via ${line.number}`));
+        const call = el('button', 'ah-action sv-callback');
+        call.innerHTML = GLYPH.call;
+        call.title = `Call back as ${line.number}`;
         call.addEventListener('click', () => {
-            overlay.remove();
-            PhoneOS.startCall(e.number);
+            if (caller && PhoneOS.startCall) PhoneOS.startCall(caller, { asLine: line.number });
         });
+        head.append(back, center, call);
+        view.append(head);
 
-        const text = document.createElement('button');
-        text.className = 'confirm-btn';
-        text.textContent = `Text ${e.number}`;
-        text.addEventListener('click', () => {
-            overlay.remove();
-            PhoneOS.router.openApp('messages', null, { composeTo: e.number });
-        });
+        const scroller = el('div', 'chat-scroller');
+        const list = el('div', 'chat-list');
+        scroller.append(list);
+        view.append(scroller);
 
-        const cancel = document.createElement('button');
-        cancel.className = 'confirm-btn';
-        cancel.textContent = 'Cancel';
-        cancel.addEventListener('click', () => overlay.remove());
+        const paint = (messages) => {
+            list.textContent = '';
+            for (const m of messages) {
+                const mine = m.sender === line.number;
+                const wrap = el('div', 'bubble-wrap ' + (mine ? 'mine' : 'theirs'));
+                const b = el('div', 'bubble');
+                b.textContent = m.body || (m.location ? '📍 ' + (m.location.label || 'Location') : '');
+                wrap.append(b);
+                list.append(wrap);
+            }
+            scroller.scrollTop = scroller.scrollHeight;
+        };
 
-        sheet.append(title, call, text, cancel);
-        overlay.append(sheet);
-        document.getElementById('phone-screen').append(overlay);
+        const res = await PhoneOS.api('line:messages', { number: line.number, threadId });
+        if (!fresh()) return;
+        let messages = (res && res.ok && res.data.messages) || [];
+        paint(messages);
+
+        const bar = el('div', 'chat-inputbar');
+        const input = ui.textInput({ placeholder: `Reply as ${line.number}` });
+        input.classList.add('chat-input');
+        const send = el('button', 'chat-send', '↑');
+        input.addEventListener('input', () => send.classList.toggle('ready', input.value.trim().length > 0));
+        const doSend = async () => {
+            const body = input.value.trim();
+            if (!body) return;
+            send.disabled = true;
+            const r = await PhoneOS.api('line:send', { number: line.number, threadId, body });
+            send.disabled = false;
+            if (!r || !r.ok) {
+                PhoneOS.notify({ app: 'services', title: line.label, body: r && r.error === 'off_duty' ? 'You went off duty.' : 'Message failed to send.' });
+                return;
+            }
+            input.value = '';
+            send.classList.remove('ready');
+            messages = [...messages, r.data];
+            paint(messages);
+        };
+        send.addEventListener('click', doSend);
+        input.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSend(); });
+        bar.append(input, send);
+        view.append(bar);
+
+        lineChat.append = (m) => {
+            messages = [...messages, m];
+            paint(messages);
+        };
     }
 
     function announcementSheet(view, biz) {
-        const overlay = document.createElement('div');
-        overlay.className = 'picker-overlay';
-        const sheet = document.createElement('div');
-        sheet.className = 'picker-sheet';
-
-        const title = document.createElement('div');
-        title.className = 'picker-title';
-        title.textContent = `${biz.label} announcement`;
-
-        const input = ui.textInput({
-            placeholder: 'e.g. Half-price repairs until 8pm (blank clears)',
-            value: biz.announcement || '',
-        });
+        const overlay = el('div', 'picker-overlay');
+        const sheet = el('div', 'picker-sheet');
+        sheet.append(el('div', 'picker-title', `${biz.label} announcement`));
+        const input = ui.textInput({ placeholder: 'e.g. Half-price repairs until 8pm (blank clears)', value: biz.announcement || '' });
         input.maxLength = 140;
-
-        const save = document.createElement('button');
-        save.className = 'confirm-btn confirm-primary';
-        save.textContent = 'Publish';
+        const save = el('button', 'confirm-btn confirm-primary', 'Publish');
         save.addEventListener('click', async () => {
             const res = await PhoneOS.api('city:setAnnouncement', { text: input.value.trim() });
             overlay.remove();
             if (res && res.ok) render(view);
         });
-
-        const cancel = document.createElement('button');
-        cancel.className = 'confirm-btn';
-        cancel.textContent = 'Cancel';
+        const cancel = el('button', 'confirm-btn', 'Cancel');
         cancel.addEventListener('click', () => overlay.remove());
-
-        sheet.append(title, input, save, cancel);
+        sheet.append(input, save, cancel);
         overlay.append(sheet);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
         document.getElementById('phone-screen').append(overlay);
     }
 
+    PhoneOS.on('phone:lineMessage', (d) => {
+        if (!d || !d.message) return;
+        const viewing = current && document.body.contains(current.view) && PhoneOS.isOpen() && current.line.number === d.line;
+        if (viewing && current.threadId === d.threadId && lineChat.append) {
+            lineChat.append(d.message);
+            return;
+        }
+        if (viewing && current.threadId === null) {
+            lineInbox(current.view, current.line);
+        }
+        if (d.reply) return;
+        PhoneOS.notify({
+            app: 'services',
+            title: `${d.label || d.line} · ${PhoneOS.resolveName(d.message.sender)}`,
+            body: d.message.body || (d.message.location ? 'Shared a location' : 'New message'),
+        });
+    });
+
     PhoneOS.registerApp({
-        id: 'services', name: 'City',
+        id: 'services', name: 'Services',
         iconBg: 'linear-gradient(135deg,#43b5a0,#20826f)',
         glyph: PhoneOS.glyphs.services,
         render,

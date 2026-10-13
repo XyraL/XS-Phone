@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS `phone_phones` (
     `pin`            VARCHAR(10)  DEFAULT NULL,
     `settings`       LONGTEXT     DEFAULT NULL,
     `installed_apps` LONGTEXT     DEFAULT NULL,
+    `photo`          VARCHAR(255) DEFAULT NULL,
     `created_at`     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`citizenid`),
     UNIQUE KEY `number` (`number`)
@@ -51,7 +52,7 @@ CREATE TABLE IF NOT EXISTS `phone_messages` (
     `sender_number` VARCHAR(15)  NOT NULL,
     `body`          TEXT         NOT NULL,
     `media_url`     VARCHAR(255) DEFAULT NULL,
-    `location`      VARCHAR(100) DEFAULT NULL,
+    `location`      VARCHAR(160) DEFAULT NULL,
     `sent_at`       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `thread` (`thread_id`, `id`)
@@ -296,4 +297,101 @@ CREATE TABLE IF NOT EXISTS `phone_business_info` (
     `announcement` VARCHAR(140) DEFAULT NULL,
     `updated_at`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`job`)
+);
+
+CREATE TABLE IF NOT EXISTS `phone_places` (
+    `id`           INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `owner_number` VARCHAR(15)  NOT NULL,
+    `label`        VARCHAR(40)  NOT NULL,
+    `icon`         VARCHAR(12)  NOT NULL DEFAULT 'pin',
+    `x`            FLOAT        NOT NULL,
+    `y`            FLOAT        NOT NULL,
+    `created_at`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `owner` (`owner_number`)
+);
+
+CREATE TABLE IF NOT EXISTS `phone_news` (
+    `id`            INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `author_cid`    VARCHAR(50)  NOT NULL,
+    `author_name`   VARCHAR(60)  NOT NULL,
+    `author_number` VARCHAR(15)  DEFAULT NULL,
+    `title`         VARCHAR(90)  NOT NULL,
+    `body`          TEXT         NOT NULL,
+    `image_url`     VARCHAR(255) DEFAULT NULL,
+    `category`      VARCHAR(20)  NOT NULL DEFAULT 'City',
+    `breaking`      TINYINT(1)   NOT NULL DEFAULT 0,
+    `created_at`    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `phone_bills` (
+    `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `citizenid`  VARCHAR(50)  NOT NULL,
+    `source`     VARCHAR(12)  NOT NULL,
+    `ref`        VARCHAR(30)  DEFAULT NULL,
+    `label`      VARCHAR(120) DEFAULT NULL,
+    `payee`      VARCHAR(60)  DEFAULT NULL,
+    `amount`     INT          NOT NULL DEFAULT 0,
+    `status`     VARCHAR(10)  NOT NULL,
+    `created_at` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `owner` (`citizenid`)
+);
+
+CREATE TABLE IF NOT EXISTS `phone_invoices` (
+    `id`              INT(10)      NOT NULL AUTO_INCREMENT,
+    `citizenid`       VARCHAR(50)  DEFAULT NULL,
+    `amount`          INT(11)      NOT NULL DEFAULT 0,
+    `society`         TINYTEXT     DEFAULT NULL,
+    `sender`          VARCHAR(50)  DEFAULT NULL,
+    `sendercitizenid` VARCHAR(50)  DEFAULT NULL,
+    `candecline`      INT(1)       NOT NULL DEFAULT 1,
+    `reason`          VARCHAR(256) DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `citizenid` (`citizenid`)
+);
+
+CREATE TABLE IF NOT EXISTS `phone_crypto_prices` (
+    `coin`  VARCHAR(12) NOT NULL,
+    `price` DOUBLE      NOT NULL,
+    `at`    DATETIME    NOT NULL,
+    KEY `coin_at` (`coin`, `at`)
+);
+
+CREATE TABLE IF NOT EXISTS `phone_crypto_holdings` (
+    `citizenid` VARCHAR(50) NOT NULL,
+    `coin`      VARCHAR(12) NOT NULL,
+    `amount`    DOUBLE      NOT NULL DEFAULT 0,
+    PRIMARY KEY (`citizenid`, `coin`)
+);
+
+CREATE TABLE IF NOT EXISTS `phone_crypto_tx` (
+    `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `citizenid`  VARCHAR(50)  NOT NULL,
+    `coin`       VARCHAR(12)  NOT NULL,
+    `side`       VARCHAR(8)   NOT NULL,
+    `amount`     DOUBLE       NOT NULL,
+    `price`      DOUBLE       NOT NULL,
+    `usd`        INT          NOT NULL DEFAULT 0,
+    `other`      VARCHAR(15)  DEFAULT NULL,
+    `created_at` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `owner_coin` (`citizenid`, `coin`)
+);
+
+CREATE TABLE IF NOT EXISTS `phone_car_keys` (
+    `id`            INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `plate`         VARCHAR(12)  NOT NULL,
+    `owner_cid`     VARCHAR(50)  NOT NULL,
+    `holder_cid`    VARCHAR(50)  NOT NULL,
+    `holder_number` VARCHAR(15)  DEFAULT NULL,
+    `model`         VARCHAR(40)  DEFAULT NULL,
+    `hash`          BIGINT       DEFAULT NULL,
+    `expires_at`    INT UNSIGNED DEFAULT NULL,
+    `revoked`       TINYINT(1)   NOT NULL DEFAULT 0,
+    `created_at`    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `plate_holder` (`plate`, `holder_cid`),
+    KEY `holder` (`holder_cid`)
 );

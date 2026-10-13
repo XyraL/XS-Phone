@@ -15,7 +15,13 @@ PhoneCallback('XS-Phone:contacts:list', function(src)
         SELECT id, saved_number AS number, name, avatar_url AS avatar, favorite, blocked
         FROM phone_contacts WHERE owner_number = ?
         ORDER BY favorite DESC, name ASC
-    ]], { me })
+    ]], { me }) or {}
+    if PhotosFor and #rows > 0 then
+        local numbers = {}
+        for _, r in ipairs(rows) do numbers[#numbers + 1] = r.number end
+        local photos = PhotosFor(me, numbers)
+        for _, r in ipairs(rows) do r.photo = photos[r.number] end
+    end
     return { ok = true, data = rows }
 end)
 

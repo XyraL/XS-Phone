@@ -9,6 +9,8 @@
         market:   { tagline: 'Buy and sell anything', category: 'Lifestyle' },
         music:    { tagline: 'Your playlist, everywhere', category: 'Lifestyle' },
         weather:  { tagline: 'Know before you go', category: 'Lifestyle' },
+        news:     { tagline: 'Los Santos, as it happens', category: 'News' },
+        crypto:   { tagline: 'Buy low. Panic sell. Repeat.', category: 'Finance' },
         game2048: { tagline: 'Slide. Merge. 2048.', category: 'Games' },
         snake:    { tagline: 'Don\'t bite yourself', category: 'Games' },
     };
@@ -21,10 +23,8 @@
         const row = document.createElement('div');
         row.className = 'store-row';
 
-        const icon = document.createElement('div');
-        icon.className = 'app-icon store-icon';
-        icon.style.background = def.iconBg;
-        icon.innerHTML = def.glyph;
+        const icon = PhoneOS.appIcon(def);
+        icon.classList.add('store-icon');
 
         const info = document.createElement('div');
         info.className = 'store-info';

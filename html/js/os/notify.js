@@ -9,8 +9,14 @@ PhoneOS.notifications = [];
 
         const icon = document.createElement('div');
         icon.className = 'n-icon';
-        icon.style.background = app ? app.iconBg : 'linear-gradient(135deg,#8e8e93,#636366)';
-        if (app) icon.innerHTML = app.glyph;
+        const art = app && PhoneOS.icons && PhoneOS.icons.art(app.id);
+        if (art) {
+            icon.classList.add('art');
+            icon.innerHTML = art;
+        } else {
+            icon.style.background = app ? app.iconBg : 'linear-gradient(135deg,#8e8e93,#636366)';
+            if (app) icon.innerHTML = app.glyph;
+        }
 
         const body = document.createElement('div');
         body.className = 'n-body';
@@ -96,9 +102,11 @@ PhoneOS.notifications = [];
         box.textContent = '';
         for (const n of PhoneOS.notifications.slice(0, 3)) {
             const el = card(n, true);
+            el.classList.add('lg');
             attachSwipe(el, n);
             box.append(el);
         }
+        if (PhoneOS.glass) PhoneOS.glass.sync();
     }
 
     function callIsUp() {

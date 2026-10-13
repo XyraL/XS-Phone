@@ -72,17 +72,20 @@ document.addEventListener('DOMContentLoaded', () => {
         PhoneOS.dispatch('phone:open', {
             number: '555-0142',
             hasPin: false,
+            photo: null,
             settings: {
                 wallpaper: 'aurora', ringtone: 'horizon', texttone: 'pop',
-                theme: 'dark', accent: 'blue', textScale: 'default',
+                theme: 'dark', accent: 'blue', frame: 'midnight', homeLayout: '', photoShare: 'everyone', textScale: 'default',
                 time24: false, lockPreviews: true, dropEnabled: true,
                 airplane: false, dnd: false,
                 setupDone: !window.location.search.includes('setup=1'),
             },
-            installedApps: ['social', 'prism', 'market', 'music', 'weather'],
+            installedApps: ['social', 'prism', 'market', 'music', 'weather', 'news', 'crypto'],
             os: 'XyraLOS',
-            appNames: { social: 'Chirp', darkchat: 'DarkChat' },
-            version: '0.8.0-dev',
+            appNames: { social: 'Chirp', darkchat: 'DarkChat', news: 'Weazel News', services: 'Services' },
+            version: '2.0.0',
+            features: { home: true, bills: true },
+            lines: { '911': 'LSPD', '912': 'Pillbox Medical', '555-0100': 'Los Santos Customs', '555-0200': 'Downtown Cab Co.', '555-0300': 'Burger Shot' },
             badges: { messages: 1, mail: 1 },
         });
         setTimeout(() => PhoneOS.notify({

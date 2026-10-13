@@ -7,8 +7,14 @@ PhoneOS.spotlight = (() => {
         r.className = 'sp-row';
         const ic = document.createElement('div');
         ic.className = 'sp-ic';
-        ic.style.background = def.iconBg;
-        ic.innerHTML = def.glyph;
+        const art = PhoneOS.icons && PhoneOS.icons.art(def.id);
+        if (art) {
+            ic.classList.add('art');
+            ic.innerHTML = art;
+        } else {
+            ic.style.background = def.iconBg;
+            ic.innerHTML = def.glyph;
+        }
         const nm = document.createElement('div');
         nm.className = 'sp-name';
         nm.textContent = PhoneOS.appName(def.id);
@@ -51,8 +57,10 @@ PhoneOS.spotlight = (() => {
         }
 
         const installed = (PhoneOS.state && PhoneOS.state.installedApps) || [];
+        const features = (PhoneOS.state && PhoneOS.state.features) || {};
         const apps = PhoneOS.apps.filter((a) => {
             if (a.store && !installed.includes(a.id)) return false;
+            if (a.requires && !features[a.requires]) return false;
             return PhoneOS.appName(a.id).toLowerCase().includes(term);
         }).slice(0, 5);
 
