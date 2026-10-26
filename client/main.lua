@@ -194,6 +194,10 @@ RegisterNetEvent('XS-Phone:client:pushNotify', function(n)
     end
 end)
 
+RegisterNetEvent('XS-TaxiJob:client:rideStatus', function(status)
+    SendNUIMessage({ action = 'phone:taxiStatus', data = status })
+end)
+
 RegisterNetEvent('XS-Phone:client:lineMessage', function(payload)
     SendNUIMessage({ action = 'phone:lineMessage', data = payload })
     if not phoneOpen and not quietMode() and not payload.reply then

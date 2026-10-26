@@ -76,6 +76,9 @@ local API = {
     ['line:threads']         = 'XS-Phone:line:threads',
     ['line:messages']        = 'XS-Phone:line:messages',
     ['line:send']            = 'XS-Phone:line:send',
+    ['taxi:status']          = 'XS-Phone:taxi:status',
+    ['taxi:call']            = 'XS-Phone:taxi:call',
+    ['taxi:cancel']          = 'XS-Phone:taxi:cancel',
 
     ['phone:changeNumber']   = 'XS-Phone:phone:changeNumber',
     ['profile:photos']       = 'XS-Phone:profile:photos',

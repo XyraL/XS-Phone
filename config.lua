@@ -315,6 +315,7 @@ Config.Phone = {
         newsPost = 6,
         cryptoTrade = 20,
         billPay = 10,
+        taxiCall = 6,
         billSend = 10,
         homeWrite = 20,
         garageRemote = 30,

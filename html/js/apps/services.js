@@ -6,10 +6,19 @@
         text: '<svg viewBox="0 0 24 24"><path d="M12 3C6.5 3 2 6.6 2 11c0 2.5 1.4 4.7 3.6 6.2-.2 1.1-.8 2.2-1.5 3 1.7-.2 3.3-.9 4.5-1.7 1.1.3 2.2.5 3.4.5 5.5 0 10-3.6 10-8S17.5 3 12 3z"/></svg>',
         gps: '<svg viewBox="0 0 24 24"><path d="M20.5 3.5L3.6 10.7c-.6.3-.5 1.2.1 1.3l7 1.3 1.3 7c.1.7 1 .8 1.3.1l7.2-16.9z"/></svg>',
         edit: '<svg viewBox="0 0 24 24"><path d="M4 17.2V20h2.8l8.3-8.3-2.8-2.8L4 17.2zm13.7-7.6a1 1 0 0 0 0-1.4l-1.9-1.9a1 1 0 0 0-1.4 0l-1.5 1.5 2.8 2.8 1.5-1.5z"/></svg>',
+        taxi: '<svg viewBox="0 0 24 24"><path d="M9.6 2.4h4.8a.6.6 0 0 1 .6.6v1.7H9V3a.6.6 0 0 1 .6-.6zM5 11l1.6-4.3A2 2 0 0 1 8.5 5.4h7a2 2 0 0 1 1.9 1.3L19 11a2 2 0 0 1 1.5 1.9v4.6a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-.9h-11v.9a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-4.6A2 2 0 0 1 5 11zm2.2-.5h9.6l-1.1-3a.6.6 0 0 0-.6-.4H8.9a.6.6 0 0 0-.6.4l-1.1 3zM7 13a1.2 1.2 0 1 0 0 2.4A1.2 1.2 0 0 0 7 13zm10 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4z"/></svg>',
+    };
+    const TAXI_ERRORS = {
+        rate_limited: 'Slow down a little.',
+        airplane: 'Turn off Airplane Mode first.',
+        no_taxi: 'Taxi dispatch is offline.',
+        no_phone: 'You need a phone for that.',
+        transport: 'Taxi dispatch is offline.',
     };
     const CATEGORY_ICON = { Emergency: 'police', Vehicles: 'car', Transport: 'car', 'Food & Drink': 'food' };
 
     let current = null;
+    let taxiCard = null;
 
     function el(tag, cls, text) {
         const n = document.createElement(tag);
@@ -56,6 +65,66 @@
         document.getElementById('phone-screen').append(overlay);
     }
 
+    function taxiButton(text, cls, onTap) {
+        const b = el('button', 'sv-taxi-btn' + (cls ? ' ' + cls : ''), text);
+        b.type = 'button';
+        b.addEventListener('click', async () => {
+            b.disabled = true;
+            await onTap();
+            b.disabled = false;
+        });
+        return b;
+    }
+
+    async function taxiRun(name) {
+        const res = await PhoneOS.api(name);
+        if (!res || !res.ok) {
+            PhoneOS.notify({ app: 'services', title: 'Taxi', body: TAXI_ERRORS[res && res.error] || (res && res.error) || 'That didn’t work.' });
+        }
+        if (res && res.data && taxiCard) paintTaxi(taxiCard, res.data);
+    }
+
+    function paintTaxi(card, s) {
+        s = s || { state: 'none' };
+        card.textContent = '';
+        card.hidden = !!s.driving;
+        const head = el('div', 'sv-taxi-head');
+        const ic = el('div', 'sv-taxi-ic');
+        ic.innerHTML = GLYPH.taxi;
+        const body = el('div', 'sv-taxi-body');
+        head.append(ic, body);
+        card.append(head);
+        const cancel = () => taxiButton('Cancel', 'ghost', () => taxiRun('taxi:cancel'));
+
+        if (s.state === 'waiting') {
+            const n = Number(s.drivers || 0);
+            body.append(el('div', 'sv-taxi-title', 'Finding you a cab'),
+                el('div', 'sv-taxi-sub', `Sent to ${n} driver${n === 1 ? '' : 's'}. Stay where you are.`));
+            head.append(el('span', 'sv-taxi-pulse'));
+            card.append(cancel());
+        } else if (s.state === 'accepted') {
+            body.append(el('div', 'sv-taxi-title', `${s.driver || 'A driver'} is on the way`),
+                el('div', 'sv-taxi-sub', 'Stay where you are.'));
+            if (s.vehicle || s.plate) {
+                const meta = el('div', 'sv-taxi-meta');
+                if (s.vehicle) meta.append(el('span', 'sv-taxi-chip', s.vehicle));
+                if (s.plate) meta.append(el('span', 'sv-taxi-chip plate', s.plate));
+                card.append(meta);
+            }
+            card.append(cancel());
+        } else if (s.state === 'riding') {
+            body.append(el('div', 'sv-taxi-title', 'On your way'),
+                el('div', 'sv-taxi-sub', `With ${s.driver || 'your driver'}. You pay the meter at the end.`));
+        } else {
+            const free = Number(s.drivers || 0);
+            body.append(el('div', 'sv-taxi-title', 'Need a ride?'),
+                el('div', 'sv-taxi-sub', free ? `${free} cab${free === 1 ? '' : 's'} free. A driver comes to you.` : 'No cabs free right now.'));
+            const call = taxiButton('Call a cab', '', () => taxiRun('taxi:call'));
+            if (!free) call.disabled = true;
+            card.append(call);
+        }
+    }
+
     function emergencyTile(biz) {
         const t = el('button', 'sv-sos ' + (biz.job === 'police' ? 'pd' : 'ems'));
         t.type = 'button';
@@ -92,6 +161,7 @@
 
     async function render(view) {
         current = null;
+        taxiCard = null;
         const fresh = PhoneOS.freshRender(view);
         view.textContent = '';
         view.append(ui.header(title()));
@@ -103,6 +173,12 @@
         const entries = (res && res.ok && res.data) || [];
         const lines = (res && res.lines) || [];
         const content = ui.content();
+
+        if (res && res.taxi) {
+            taxiCard = el('div', 'sv-taxi');
+            paintTaxi(taxiCard, res.taxi);
+            content.append(taxiCard);
+        }
 
         if (lines.length) {
             content.append(ui.label('Your line'));
@@ -282,6 +358,10 @@
         overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
         document.getElementById('phone-screen').append(overlay);
     }
+
+    PhoneOS.on('phone:taxiStatus', (s) => {
+        if (taxiCard && document.body.contains(taxiCard)) paintTaxi(taxiCard, s);
+    });
 
     PhoneOS.on('phone:lineMessage', (d) => {
         if (!d || !d.message) return;

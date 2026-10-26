@@ -2,6 +2,10 @@
 
 All notable changes to **XS-Phone**.
 
+## [2.1.0] — 2026-10-26
+
+- Call a cab from the Services app when XS-TaxiJob is running, and see who's coming and their plate
+
 ## [2.0.0] — 2026-10-13
 
 A whole new look and a lot of new apps.

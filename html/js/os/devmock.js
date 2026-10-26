@@ -81,6 +81,7 @@
             { job: 'taxi', label: 'Downtown Cab Co.', category: 'Transport', emergency: false, number: '555-0200', open: false, onDuty: 0, announcement: null, isBoss: false, x: 903, y: -170 },
             { job: 'burgershot', label: 'Burger Shot', category: 'Food & Drink', emergency: false, number: '555-0300', open: true, onDuty: 3, announcement: null, isBoss: false, x: -1183, y: -884 },
         ],
+        taxi: { state: 'none', drivers: 3 },
         darkRooms: [
             { id: 500, code: 'K7XR2Q', name: 'the yard', handle: 'ghost_204', members: 4 },
         ],
@@ -550,7 +551,24 @@
             return ok();
         },
 
-        'city:list': () => ok([...db.city], { lines: [{ number: '555-0100', label: 'Los Santos Customs', chats: db.lineThreads.length }] }),
+        'city:list': () => ok([...db.city], { lines: [{ number: '555-0100', label: 'Los Santos Customs', chats: db.lineThreads.length }], taxi: { ...db.taxi } }),
+        'taxi:status': () => ok({ ...db.taxi }),
+        'taxi:call': () => {
+            if (db.taxi.state !== 'none') return err('You already have a cab coming.');
+            db.taxi = { state: 'waiting', drivers: 3 };
+            setTimeout(() => {
+                if (db.taxi.state !== 'waiting') return;
+                db.taxi = { state: 'accepted', driver: 'Terrence Obi', vehicle: 'Taxi', plate: 'TAXI 042' };
+                PhoneOS.dispatch('phone:taxiStatus', { ...db.taxi });
+                PhoneOS.dispatch('phone:notify', { app: 'services', title: 'Taxi', body: 'Terrence Obi took your call.' });
+            }, 3000);
+            return ok({ ...db.taxi });
+        },
+        'taxi:cancel': () => {
+            if (db.taxi.state === 'none') return err('You have no cab coming.');
+            db.taxi = { state: 'none', drivers: 3 };
+            return ok({ ...db.taxi });
+        },
         'line:threads': (d) => ok({ line: d.number, label: 'Los Santos Customs', threads: db.lineThreads.map((t) => {
             const last = t.messages[t.messages.length - 1];
             return { id: t.id, caller: t.caller, lastBody: last.body, lastSender: last.sender, lastAt: last.sentAt };

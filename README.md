@@ -148,6 +148,9 @@ the phone mid-anything and it reopens right where you left it.
   MLO houses through ox_doorlock, qbx_properties has no locks of its own.
   Keys and the doorbell work on all of them (bcs_housing keys stay in its own
   menu).
+- **Taxis**: with XS-TaxiJob running, the Services app gets a Call a cab
+  card. It shows how many cabs are free, then who took your call and their
+  plate.
 - **Bills and fines**: reads the `phone_invoices` table that qb-phone used
   (it creates it if you don't have one, so `/fine` and other billing scripts
   that write there just work), plus okokBilling and peleg-billing. Paid bills go

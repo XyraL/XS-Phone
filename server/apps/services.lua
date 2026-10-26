@@ -80,6 +80,25 @@ function GetDutyRoster(job)
     return count, sources
 end
 
+local TAXI = 'XS-TaxiJob'
+
+local function taxiStatus(src)
+    if GetResourceState(TAXI) ~= 'started' then return nil end
+    local ok, status = pcall(function() return exports[TAXI]:GetRideStatus(src) end)
+    if not ok or type(status) ~= 'table' then return nil end
+    return status
+end
+
+local function taxiAction(src, run)
+    if GetResourceState(TAXI) ~= 'started' then return { ok = false, error = 'no_taxi' } end
+    local me = EnsurePhone(src)
+    if not me then return { ok = false, error = 'no_phone' } end
+    if me.settings.airplane then return { ok = false, error = 'airplane' } end
+    local ok, result = pcall(run)
+    if not ok or type(result) ~= 'table' then return { ok = false, error = 'no_taxi' } end
+    return { ok = result.ok == true, error = result.error, data = taxiStatus(src) }
+end
+
 PhoneCallback('XS-Phone:city:list', function(src)
     local me = GetPhoneNumber(src)
     if not me then return { ok = false, error = 'no_phone' } end
@@ -117,7 +136,7 @@ PhoneCallback('XS-Phone:city:list', function(src)
             mine[#mine + 1] = { number = tostring(biz.number), label = biz.label, chats = count }
         end
     end
-    return { ok = true, data = out, lines = mine }
+    return { ok = true, data = out, lines = mine, taxi = taxiStatus(src) }
 end)
 
 PhoneCallback('XS-Phone:city:setAnnouncement', function(src, data)
@@ -200,4 +219,19 @@ PhoneCallback('XS-Phone:line:send', function(src, data)
     local message = DeliverMessage(threadId, tostring(biz.number), body)
     NotifyLine(biz, { line = tostring(biz.number), label = biz.label, threadId = threadId, message = message, reply = true }, src)
     return { ok = true, data = message }
+end)
+
+PhoneCallback('XS-Phone:taxi:status', function(src)
+    local status = taxiStatus(src)
+    if not status then return { ok = false, error = 'no_taxi' } end
+    return { ok = true, data = status }
+end)
+
+PhoneCallback('XS-Phone:taxi:call', function(src)
+    if not RateOK(src, 'taxiCall') then return { ok = false, error = 'rate_limited' } end
+    return taxiAction(src, function() return exports[TAXI]:RequestRide(src, 'phone') end)
+end)
+
+PhoneCallback('XS-Phone:taxi:cancel', function(src)
+    return taxiAction(src, function() return exports[TAXI]:CancelRide(src) end)
 end)

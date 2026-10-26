@@ -923,6 +923,46 @@
 .sv-line-title { font-size: 16px; font-weight: 700; }
 .sv-line-sub { font-size: 12.5px; color: var(--app-text-dim); }
 
+.sv-taxi {
+    --taxi: #f5b229;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 16px 16px;
+    margin-bottom: 4px;
+    border-radius: 22px;
+    color: var(--app-text);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--taxi) 24%, var(--app-surface)), var(--app-surface));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--taxi) 32%, transparent);
+}
+.sv-taxi[hidden] { display: none; }
+.sv-taxi-head { display: flex; align-items: center; gap: 12px; }
+.sv-taxi-ic { width: 40px; height: 40px; border-radius: 12px; background: var(--taxi); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sv-taxi-ic svg { width: 23px; height: 23px; fill: #1a1305; }
+.sv-taxi-body { flex: 1; min-width: 0; }
+.sv-taxi-title { font-size: 16px; font-weight: 700; }
+.sv-taxi-sub { font-size: 12.5px; color: var(--app-text-dim); }
+.sv-taxi-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+.sv-taxi-chip { padding: 4px 9px; border-radius: 9px; font-size: 12px; font-weight: 600; background: color-mix(in srgb, var(--app-text) 10%, transparent); }
+.sv-taxi-chip.plate { font-family: ui-monospace, Menlo, Consolas, monospace; letter-spacing: .06em; }
+.sv-taxi-btn {
+    height: 44px;
+    border: none;
+    border-radius: 14px;
+    background: var(--taxi);
+    color: #1a1305;
+    font: 700 15px/1 var(--font);
+    cursor: pointer;
+}
+.sv-taxi-btn:active { transform: scale(0.98); }
+.sv-taxi-btn:disabled { opacity: .45; cursor: default; transform: none; }
+.sv-taxi-btn.ghost { background: transparent; color: #ff453a; box-shadow: inset 0 0 0 1px color-mix(in srgb, #ff453a 45%, transparent); }
+.sv-taxi-pulse { width: 10px; height: 10px; border-radius: 50%; background: var(--taxi); flex-shrink: 0; animation: sv-taxi-pulse 1.4s infinite; }
+@keyframes sv-taxi-pulse {
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--taxi) 60%, transparent); }
+    70%, 100% { box-shadow: 0 0 0 10px transparent; }
+}
+
 .sv-sos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .sv-sos {
     position: relative;
