@@ -2,6 +2,11 @@
 
 All notable changes to **XS-Phone**.
 
+## [2.1.1] — 2026-10-27
+
+- The call screen covers the phone again, instead of showing over your home screen
+- Tinted buttons, badges and cards show their colours in game
+
 ## [2.1.0] — 2026-10-26
 
 - Call a cab from the Services app when XS-TaxiJob is running, and see who's coming and their plate

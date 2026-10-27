@@ -14,6 +14,7 @@
         const hud = document.getElementById('camera-hud');
         if (hud) hud.remove();
         document.body.classList.remove('cam-full');
+        document.getElementById('app-layer').classList.remove('camera-layer');
         if (!live) return;
         live = false;
         PhoneOS.nui('cameraMode', { active: false });
@@ -61,6 +62,7 @@
 
     function render(view, params) {
         view.classList.add('camera-view');
+        document.getElementById('app-layer').classList.add('camera-layer');
         selfie = !!(params && params.selfie);
         zoom = 1;
         live = true;

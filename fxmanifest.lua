@@ -5,7 +5,7 @@ lua54 'yes'
 name 'XS-Phone'
 author 'XyraL'
 description 'iPhone-style smartphone for QBox/QBCore.'
-version '2.1.0'
+version '2.1.1'
 
 dependencies {
     'ox_lib',

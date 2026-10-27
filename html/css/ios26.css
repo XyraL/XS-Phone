@@ -525,7 +525,7 @@ body { -webkit-font-smoothing: antialiased; font-optical-sizing: auto; }
     color: var(--app-text);
     font-size: 0;
     align-self: flex-start;
-    background: color-mix(in srgb, var(--app-surface-2) 78%, transparent);
+    background: rgba(var(--app-surface-2-rgb), 0.78);
     box-shadow: var(--glass-rim), 0 4px 14px rgba(0, 0, 0, 0.18);
     transition: transform 0.15s var(--bounce);
 }
@@ -554,14 +554,14 @@ body { -webkit-font-smoothing: antialiased; font-optical-sizing: auto; }
     font-size: 21px;
     font-weight: 500;
     align-self: flex-start;
-    background: color-mix(in srgb, var(--app-surface-2) 78%, transparent);
+    background: rgba(var(--app-surface-2-rgb), 0.78);
     box-shadow: var(--glass-rim), 0 4px 14px rgba(0, 0, 0, 0.18);
     transition: transform 0.15s var(--bounce);
 }
 .ah-action.text { font-size: 15px; font-weight: 600; padding: 0 16px; }
 .app-header .ah-back + .ah-action { margin-left: auto; }
 .app-header.compact {
-    background: color-mix(in srgb, var(--app-bg) 92%, transparent);
+    background: rgba(var(--app-bg-rgb), 0.92);
     box-shadow: 0 0.5px 0 var(--app-separator);
 }
 .app-header.compact .ah-title { font-size: 17px; position: absolute; left: 60px; right: 60px; bottom: 16px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -573,7 +573,7 @@ body { -webkit-font-smoothing: antialiased; font-optical-sizing: auto; }
 .list-row + .list-row::before { left: 16px; height: 0.5px; }
 .row-label { font-size: 15.5px; }
 
-.switch { width: 52px; height: 31px; border-radius: 16px; background: color-mix(in srgb, var(--app-text) 16%, transparent); }
+.switch { width: 52px; height: 31px; border-radius: 16px; background: rgba(var(--app-text-rgb), 0.16); }
 .switch::after {
     top: 2px;
     left: 2px;
@@ -603,7 +603,7 @@ body { -webkit-font-smoothing: antialiased; font-optical-sizing: auto; }
 }
 .picker-sheet, .confirm-sheet {
     border-radius: 34px;
-    background: color-mix(in srgb, var(--app-surface) 97%, transparent);
+    background: rgba(var(--app-surface-rgb), 0.97);
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 0.5px 0 rgba(255, 255, 255, 0.14);
     animation: sheetspring 0.48s var(--bounce);
     padding: 18px 14px 14px;
@@ -624,12 +624,12 @@ body { -webkit-font-smoothing: antialiased; font-optical-sizing: auto; }
     padding: 5px;
     border: none;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--app-surface-2) 88%, transparent);
+    background: rgba(var(--app-surface-2-rgb), 0.88);
     box-shadow: var(--glass-rim), 0 10px 28px rgba(0, 0, 0, 0.32);
     justify-content: space-between;
 }
 .phone-tab { flex: 1; padding: 6px 4px 5px; border-radius: 999px; transition: background 0.2s, color 0.2s; }
-.phone-tab.selected { background: color-mix(in srgb, var(--app-text) 11%, transparent); color: var(--accent); }
+.phone-tab.selected { background: rgba(var(--app-text-rgb), 0.11); color: var(--accent); }
 .phone-tab .pt-icon svg { width: 22px; height: 22px; }
 .phone-tab .pt-label { font-size: 10px; }
 
@@ -642,12 +642,12 @@ body { -webkit-font-smoothing: antialiased; font-optical-sizing: auto; }
 #toasts { top: 50px; left: 10px; right: 10px; }
 .notif-card { border-radius: 22px; padding: 12px 14px; }
 #toasts .notif-card {
-    background: color-mix(in srgb, #f4f4f8 92%, transparent);
+    background: rgba(244, 244, 248, 0.92);
     box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35), inset 0 0.5px 0 rgba(255, 255, 255, 0.8);
     animation: toastin 0.5s var(--bounce);
 }
 .theme-dark #toasts .notif-card {
-    background: color-mix(in srgb, #2a2a30 94%, transparent);
+    background: rgba(42, 42, 48, 0.94);
     color: #fff;
     box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45), inset 0 0.5px 0 rgba(255, 255, 255, 0.16);
 }

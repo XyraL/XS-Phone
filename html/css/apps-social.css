@@ -322,9 +322,13 @@
     --app-surface: #121218;
     --app-surface-2: #1c1c26;
     --app-text: #d9d9e3;
+    --app-surface-rgb: 18, 18, 24;
+    --app-surface-2-rgb: 28, 28, 38;
+    --app-text-rgb: 217, 217, 227;
     --app-text-dim: rgba(190, 190, 210, 0.45);
     --app-separator: rgba(255, 255, 255, 0.06);
     --accent: #8f6fff;
+    --accent-rgb: 143, 111, 255;
 }
 .dark-line {
     font-size: 13.5px;

@@ -361,7 +361,7 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    background: rgba(var(--accent-rgb), 0.14);
     padding: 5px 12px;
     border-radius: 12px;
 }
