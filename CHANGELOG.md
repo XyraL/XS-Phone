@@ -2,6 +2,15 @@
 
 All notable changes to **XS-Phone**.
 
+## [2.1.2] — 2026-10-30
+
+- Switching character hangs up your calls, closes the phone, stops music and the torch, and refunds a valet that has not arrived
+- Calls and messages to your last character no longer reach the new one
+- Only the person who rang the doorbell can be let in
+- A phone animation that will not load no longer stops the phone opening
+
+Replace everything except your config.lua. No SQL to run.
+
 ## [2.1.1] — 2026-10-27
 
 - The call screen covers the phone again, instead of showing over your home screen

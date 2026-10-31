@@ -305,6 +305,13 @@ RegisterNetEvent('XS-Phone:client:valetKeys', function(plate)
     pcall(function() TriggerEvent('vehiclekeys:client:SetOwner', plate) end)
 end)
 
+RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
+    if not valet then return end
+    if valet.driver and DoesEntityExist(valet.driver) then DeleteEntity(valet.driver) end
+    if valet.blip and DoesBlipExist(valet.blip) then RemoveBlip(valet.blip) end
+    valet = nil
+end)
+
 AddEventHandler('onResourceStop', function(res)
     if res ~= GetCurrentResourceName() or not valet then return end
     if valet.driver and DoesEntityExist(valet.driver) then DeleteEntity(valet.driver) end

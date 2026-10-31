@@ -113,3 +113,7 @@ end)
 AddEventHandler('playerDropped', function()
     pending[source] = nil
 end)
+
+AddEventHandler('QBCore:Server:OnPlayerUnload', function(src)
+    pending[tonumber(src) or source] = nil
+end)

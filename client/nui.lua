@@ -234,10 +234,14 @@ RegisterNUICallback('musicPlay', function(data, cb)
     cb({ ok = ok })
 end)
 
-RegisterNUICallback('musicStop', function(_, cb)
+local function stopMusic()
     pcall(function()
         if exports.xsound:soundExists(MUSIC_ID) then exports.xsound:Destroy(MUSIC_ID) end
     end)
+end
+
+RegisterNUICallback('musicStop', function(_, cb)
+    stopMusic()
     cb({ ok = true })
 end)
 
@@ -346,6 +350,11 @@ RegisterNUICallback('torch', function(data, cb)
     end
 
     cb({ ok = true })
+end)
+
+RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
+    torchOn = false
+    stopMusic()
 end)
 
 AddEventHandler('onResourceStop', function(res)

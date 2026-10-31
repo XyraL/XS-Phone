@@ -360,20 +360,28 @@ PhoneCallback('XS-Phone:calls:history', function(src)
     return { ok = true, data = out }
 end)
 
-AddEventHandler('playerDropped', function()
-    local src = source
+local function hangUpAll(src)
     for _, call in pairs(calls) do
         for number, m in pairs(call.members) do
             if m.src == src then
                 if m.state == 'ringing' then
                     dropMember(call, number)
                     closeLeg(call, m, 'no_answer')
+                    pushState(src, { phase = 'ended', callId = call.id, reason = 'no_answer' })
                     settle(call, 'no_answer', { number = shown(m), reason = 'no_answer' })
                 else
-                    leave(call, number, nil)
+                    leave(call, number, src)
                 end
                 break
             end
         end
     end
+end
+
+AddEventHandler('playerDropped', function()
+    hangUpAll(source)
+end)
+
+AddEventHandler('QBCore:Server:OnPlayerUnload', function(src)
+    hangUpAll(tonumber(src) or source)
 end)

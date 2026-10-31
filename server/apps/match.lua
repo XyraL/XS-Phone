@@ -298,3 +298,9 @@ AddEventHandler('playerDropped', function()
     deckTokens[source] = nil
     LastSwipe[source] = nil
 end)
+
+AddEventHandler('QBCore:Server:OnPlayerUnload', function(src)
+    src = tonumber(src) or source
+    deckTokens[src] = nil
+    LastSwipe[src] = nil
+end)

@@ -9,7 +9,7 @@ local ANIM = {
 local function attachProp()
     if phoneProp ~= 0 then return end
     local model = `prop_amb_phone`
-    lib.requestModel(model, 2000)
+    if not (pcall(lib.requestModel, model, 2000) and HasModelLoaded(model)) then return end
 
     local ped = PlayerPedId()
     local coords = GetEntityCoords(ped)
@@ -26,7 +26,7 @@ local function removeProp()
 end
 
 local function playTextAnim()
-    lib.requestAnimDict(ANIM.dict, 2000)
+    if not (pcall(lib.requestAnimDict, ANIM.dict, 2000) and HasAnimDictLoaded(ANIM.dict)) then return end
     TaskPlayAnim(PlayerPedId(), ANIM.dict, ANIM.text, 8.0, -8.0, -1, 49, 0, false, false, false)
 end
 
@@ -227,6 +227,11 @@ end)
 
 RegisterNetEvent('XS-Phone:client:darkchat', function(payload)
     SendNUIMessage({ action = 'phone:darkchat', data = payload })
+end)
+
+RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
+    ClosePhone()
+    ClientSettings = nil
 end)
 
 AddEventHandler('onResourceStop', function(res)

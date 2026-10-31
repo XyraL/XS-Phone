@@ -71,11 +71,19 @@ function GetSettingsByNumber(number)
     return src and bySrc[src] and bySrc[src].settings or nil
 end
 
-AddEventHandler('playerDropped', function()
-    local entry = bySrc[source]
+local function forget(src)
+    local entry = bySrc[src]
     if entry then byNumber[entry.number] = nil end
-    bySrc[source] = nil
+    bySrc[src] = nil
+end
+
+AddEventHandler('playerDropped', function()
+    forget(source)
     buckets[source] = nil
+end)
+
+AddEventHandler('QBCore:Server:OnPlayerUnload', function(src)
+    forget(tonumber(src) or source)
 end)
 
 local function generateNumber()

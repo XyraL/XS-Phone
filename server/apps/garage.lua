@@ -474,10 +474,11 @@ PhoneCallback('XS-Phone:garage:valet', function(src, data)
     end
 
     local drive = valet.drive ~= false
-    pendingValet[src] = { row = row, mode = mode, cost = cost, expires = os.time() + (drive and 600 or 120) }
+    local ticket = { row = row, mode = mode, cost = cost, expires = os.time() + (drive and 600 or 120) }
+    pendingValet[src] = ticket
 
     SetTimeout((valet.delay or 5) * 1000, function()
-        if GetPlayerPed(src) == 0 then return end
+        if GetPlayerPed(src) == 0 or pendingValet[src] ~= ticket then return end
         TriggerClientEvent('XS-Phone:client:valetDrive', src, {
             model = name or hash,
             plate = row.plate,
@@ -506,8 +507,7 @@ RegisterNetEvent('XS-Phone:valetDone', function()
     pendingValet[source] = nil
 end)
 
-RegisterNetEvent('XS-Phone:valetFailed', function()
-    local src = source
+local function refundValet(src)
     local pending = pendingValet[src]
     pendingValet[src] = nil
     if not pending or os.time() > pending.expires or pending.keyed then return end
@@ -517,10 +517,18 @@ RegisterNetEvent('XS-Phone:valetFailed', function()
     setParked(citizenid, pending.row, pending.mode, true)
     Framework.AddMoney(src, cfg().Valet.account or 'bank', pending.cost, 'phone valet refund')
     Framework.Notify(src, 'The valet couldn\'t bring your car out — you were refunded.', 'error')
+end
+
+RegisterNetEvent('XS-Phone:valetFailed', function()
+    refundValet(source)
 end)
 
 AddEventHandler('playerDropped', function()
     pendingValet[source] = nil
+end)
+
+AddEventHandler('QBCore:Server:OnPlayerUnload', function(src)
+    refundValet(tonumber(src) or source)
 end)
 
 CreateThread(function()

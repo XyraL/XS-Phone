@@ -22,7 +22,7 @@ local function ring(homeId, label, residents, ringer)
     local name = Framework.GetName(ringer) or 'Someone'
     local key = tostring(homeId)
     rings[key] = rings[key] or {}
-    table.insert(rings[key], 1, { name = name, src = ringer, at = os.time() })
+    table.insert(rings[key], 1, { name = name, src = ringer, cid = cid, at = os.time() })
     while #rings[key] > RING_KEEP do table.remove(rings[key]) end
 
     for _, playerId in ipairs(GetPlayers()) do
@@ -97,7 +97,8 @@ local function view(src)
         for i, r in ipairs(rings[h.id] or {}) do
             list_[#list_ + 1] = {
                 i = i, name = r.name, at = r.at * 1000,
-                canLetIn = h.canLetIn == true and now - r.at < LET_IN_WINDOW and GetPlayerPed(r.src) ~= 0,
+                canLetIn = h.canLetIn == true and now - r.at < LET_IN_WINDOW and GetPlayerPed(r.src) ~= 0
+                    and Framework.GetCitizenId(r.src) == r.cid,
             }
         end
         h.rings = list_
@@ -194,7 +195,7 @@ PhoneCallback('XS-Phone:home:letIn', function(src, data)
     local h = Housing.Find(src, data.id)
     if not h or not h.canLetIn then return { ok = false, error = 'unsupported' } end
     local r = (rings[h.id] or {})[tonumber(data.ring) or 0]
-    if not r or os.time() - r.at >= LET_IN_WINDOW or GetPlayerPed(r.src) == 0 then
+    if not r or os.time() - r.at >= LET_IN_WINDOW or GetPlayerPed(r.src) == 0 or Framework.GetCitizenId(r.src) ~= r.cid then
         return { ok = false, error = 'gone' }
     end
     return { ok = true, data = { relay = { event = 'qb-houses:server:OpenDoor', args = { r.src, h.id } } } }
