@@ -189,6 +189,10 @@ exports['XS-Phone']:AddCustomApp({
     ui = 'html/app/index.html',        -- a page in your resource, or a full https:// link
     icon = 'html/app/icon.png',        -- optional, square
     colour = '#2ea8ff',                -- optional, the icon background
+    description = 'Short line for the App Store', -- optional
+    developer = 'Your name',           -- optional
+    category = 'Games',                -- optional, the App Store section
+    defaultApp = true,                 -- optional, false and players have to get it from the App Store first
 })
 exports['XS-Phone']:RemoveCustomApp('my-app')
 exports['XS-Phone']:SendCustomAppMessage('my-app', { anything = true }) -- arrives as a message event in your page
@@ -196,6 +200,8 @@ exports['XS-Phone']:SendCustomAppMessage('my-app', { anything = true }) -- arriv
 
 - Apps are removed by themselves when the resource that added them stops.
   Add yours again when XS-Phone starts (`onResourceStart`).
+- Custom apps are in the App Store. Players can remove them from the home screen
+  and get them back from the store, and the phone remembers it.
 - A custom app can't replace one of the phone's own apps.
 - Your page talks to your own resource with the usual
   `fetch('https://your-resource/callback')`.

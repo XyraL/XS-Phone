@@ -11,7 +11,10 @@ end
 function CustomApps.List()
     local out = {}
     for _, app in pairs(CustomApps.list) do
-        out[#out + 1] = { id = app.id, name = app.name, icon = app.icon, ui = app.ui, colour = app.colour }
+        out[#out + 1] = {
+            id = app.id, name = app.name, icon = app.icon, ui = app.ui, colour = app.colour,
+            description = app.description, developer = app.developer, category = app.category, defaultApp = app.defaultApp,
+        }
     end
     table.sort(out, function(a, b) return a.name < b.name end)
     return out
@@ -31,6 +34,10 @@ exports('AddCustomApp', function(def)
     CustomApps.list[id] = {
         id = id, owner = owner, ui = ui, icon = url(def.icon, owner), colour = colour,
         name = tostring(def.name or def.label or id):sub(1, 24),
+        description = type(def.description) == 'string' and def.description:sub(1, 60) or nil,
+        developer = type(def.developer) == 'string' and def.developer:sub(1, 32) or nil,
+        category = type(def.category) == 'string' and def.category:sub(1, 24) or nil,
+        defaultApp = def.defaultApp ~= false,
     }
     sync()
     return true

@@ -2,6 +2,13 @@
 
 All notable changes to **XS-Phone**.
 
+## [2.3.0] — 2026-11-01
+
+- Apps from other scripts are in the App Store now. Remove them from your home screen and download them again whenever you want
+- Fixed the phone not opening if the server wasn't fully restarted after updating
+
+Replace everything except your config.lua. No SQL to run.
+
 ## [2.2.0] — 2026-11-01
 
 - Other scripts can now add their own app to the phone, with a home screen icon and notifications

@@ -38,8 +38,7 @@ PhoneOS.home = (() => {
     }
 
     function visible(def) {
-        const installed = (PhoneOS.state && PhoneOS.state.installedApps) || [];
-        if (def.store && !installed.includes(def.id)) return false;
+        if (!PhoneOS.isInstalled(def)) return false;
         if (def.requires && !features()[def.requires]) return false;
         return true;
     }

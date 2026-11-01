@@ -106,7 +106,7 @@ function OpenPhone()
     SetNuiFocus(true, true)
     SetNuiFocusKeepInput(true)
     startControlThread()
-    res.data.customApps = CustomApps.List()
+    res.data.customApps = CustomApps and CustomApps.List() or {}
     SendNUIMessage({ action = 'phone:open', data = res.data })
 end
 

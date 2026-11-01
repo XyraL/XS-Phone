@@ -9,6 +9,13 @@ PhoneOS.getApp = function (id) {
     return PhoneOS.apps.find((a) => a.id === id) || null;
 };
 
+PhoneOS.isInstalled = function (def) {
+    if (!def || !def.store) return true;
+    const list = (PhoneOS.state && PhoneOS.state.installedApps) || [];
+    if (list.includes(def.id)) return true;
+    return def.defaultApp === true && !list.includes('-' + def.id);
+};
+
 PhoneOS.bumpBadge = function (appId) {
     if (!PhoneOS.getApp(appId)) return;
     PhoneOS.badges[appId] = (PhoneOS.badges[appId] || 0) + 1;

@@ -32,6 +32,9 @@
             def.id = app.id;
             def.name = app.name || app.id;
             def.ui = app.ui;
+            def.store = true;
+            def.defaultApp = app.defaultApp !== false;
+            def.meta = { tagline: app.description || (app.developer ? `By ${app.developer}` : ''), category: app.category || 'Apps' };
             const base = app.colour || 'linear-gradient(135deg,#636366,#3a3a3c)';
             def.iconBg = app.icon ? `center / cover no-repeat url("${cssUrl(app.icon)}"), ${app.colour || '#1c1c1e'}` : base;
             def.glyph = app.icon ? '' : `<span class="custom-letter">${esc(def.name.charAt(0).toUpperCase())}</span>`;

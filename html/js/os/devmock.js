@@ -729,11 +729,14 @@
         },
 
         'store:install': (d) => {
+            db.installed = db.installed.filter((a) => a !== '-' + d.id);
             if (!db.installed.includes(d.id)) db.installed.push(d.id);
             return ok({ installed: [...db.installed] });
         },
         'store:uninstall': (d) => {
-            db.installed = db.installed.filter((a) => a !== d.id);
+            db.installed = db.installed.filter((a) => a !== d.id && a !== '-' + d.id);
+            const def = PhoneOS.getApp(d.id);
+            if (def && def.custom) db.installed.push('-' + d.id);
             return ok({ installed: [...db.installed] });
         },
 

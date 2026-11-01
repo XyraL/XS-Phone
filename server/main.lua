@@ -303,6 +303,12 @@ local function isStoreApp(id)
     return false
 end
 
+local function isCustomApp(id)
+    return not isStoreApp(id) and #id <= 32 and id:match('^[%w_][%w_%-]*$') ~= nil
+end
+
+local MAX_INSTALLED = 64
+
 local function saveInstalled(src, entry)
     AwaitDB()
     local citizenid = Framework.GetCitizenId(src)
@@ -317,14 +323,18 @@ PhoneCallback('XS-Phone:store:install', function(src, data)
     if not entry then return { ok = false, error = 'no_character' } end
 
     local id = tostring(data and data.id or '')
-    if not isStoreApp(id) then return { ok = false, error = 'unknown_app' } end
+    if not isStoreApp(id) and not isCustomApp(id) then return { ok = false, error = 'unknown_app' } end
 
-    for _, app in ipairs(entry.installedApps) do
-        if app == id then return { ok = true, data = { installed = entry.installedApps } } end
-    end
+    local has = false
     local installed = {}
-    for _, app in ipairs(entry.installedApps) do installed[#installed + 1] = app end
-    installed[#installed + 1] = id
+    for _, app in ipairs(entry.installedApps) do
+        if app == id then has = true end
+        if app ~= '-' .. id then installed[#installed + 1] = app end
+    end
+    if not has then
+        if #installed >= MAX_INSTALLED then return { ok = false, error = 'too_many_apps' } end
+        installed[#installed + 1] = id
+    end
     entry.installedApps = installed
     saveInstalled(src, entry)
     return { ok = true, data = { installed = entry.installedApps } }
@@ -338,8 +348,9 @@ PhoneCallback('XS-Phone:store:uninstall', function(src, data)
     local id = tostring(data and data.id or '')
     local installed = {}
     for _, app in ipairs(entry.installedApps) do
-        if app ~= id then installed[#installed + 1] = app end
+        if app ~= id and app ~= '-' .. id then installed[#installed + 1] = app end
     end
+    if isCustomApp(id) and #installed < MAX_INSTALLED then installed[#installed + 1] = '-' .. id end
     entry.installedApps = installed
     saveInstalled(src, entry)
     return { ok = true, data = { installed = entry.installedApps } }

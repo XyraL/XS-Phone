@@ -15,9 +15,7 @@
         snake:    { tagline: 'Don\'t bite yourself', category: 'Games' },
     };
 
-    function installed() {
-        return (PhoneOS.state && PhoneOS.state.installedApps) || [];
-    }
+    const meta = (def) => META[def.id] || def.meta || {};
 
     function storeRow(view, def) {
         const row = document.createElement('div');
@@ -33,21 +31,21 @@
         name.textContent = PhoneOS.appName(def.id);
         const tagline = document.createElement('div');
         tagline.className = 'store-tagline';
-        tagline.textContent = (META[def.id] || {}).tagline || '';
+        tagline.textContent = meta(def).tagline || '';
         info.append(name, tagline);
 
         const btn = document.createElement('button');
         btn.className = 'store-btn';
 
         function paint() {
-            const isIn = installed().includes(def.id);
+            const isIn = PhoneOS.isInstalled(def);
             btn.textContent = isIn ? 'OPEN' : 'GET';
             btn.classList.toggle('store-open', isIn);
         }
         paint();
 
         btn.addEventListener('click', async () => {
-            if (installed().includes(def.id)) {
+            if (PhoneOS.isInstalled(def)) {
                 PhoneOS.router.openApp(def.id);
                 return;
             }
@@ -78,7 +76,7 @@
 
         const byCategory = {};
         for (const def of storeApps) {
-            const cat = (META[def.id] || {}).category || 'Apps';
+            const cat = meta(def).category || 'Apps';
             (byCategory[cat] = byCategory[cat] || []).push(def);
         }
 
@@ -90,7 +88,7 @@
             content.append(group);
         }
 
-        const removable = storeApps.filter((a) => installed().includes(a.id));
+        const removable = storeApps.filter((a) => PhoneOS.isInstalled(a));
         if (removable.length) {
             content.append(ui.label('Installed'));
             content.append(ui.group(removable.map((def) =>

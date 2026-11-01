@@ -56,10 +56,9 @@ PhoneOS.spotlight = (() => {
             return;
         }
 
-        const installed = (PhoneOS.state && PhoneOS.state.installedApps) || [];
         const features = (PhoneOS.state && PhoneOS.state.features) || {};
         const apps = PhoneOS.apps.filter((a) => {
-            if (a.store && !installed.includes(a.id)) return false;
+            if (!PhoneOS.isInstalled(a)) return false;
             if (a.requires && !features[a.requires]) return false;
             return PhoneOS.appName(a.id).toLowerCase().includes(term);
         }).slice(0, 5);
