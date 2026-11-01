@@ -2,6 +2,12 @@
 
 All notable changes to **XS-Phone**.
 
+## [2.2.0] — 2026-11-01
+
+- Other scripts can now add their own app to the phone, with a home screen icon and notifications
+
+Replace everything except your config.lua. No SQL to run.
+
 ## [2.1.2] — 2026-10-30
 
 - Logging out hangs up your calls, closes the phone, stops music and the torch, and refunds a valet that has not arrived

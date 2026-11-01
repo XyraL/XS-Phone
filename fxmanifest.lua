@@ -5,7 +5,7 @@ lua54 'yes'
 name 'XS-Phone'
 author 'XyraL'
 description 'iPhone-style smartphone for QBox/QBCore.'
-version '2.1.2'
+version '2.2.0'
 
 dependencies {
     'ox_lib',
@@ -26,6 +26,7 @@ client_scripts {
     'client/camera.lua',
     'client/garage.lua',
     'client/nui.lua',
+    'client/customapps.lua',
 }
 
 server_scripts {

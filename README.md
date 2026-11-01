@@ -172,7 +172,37 @@ exports['XS-Phone']:CreateBill(source or citizenid, amount, 'mechanic', 'Engine 
 
 -- client
 exports['XS-Phone']:IsPhoneOpen()
+exports['XS-Phone']:Close()
 ```
+
+### Apps from other scripts
+
+Other scripts can put their own app on the phone. It gets an icon on the home
+screen, shows up in search, takes notifications with its own icon, and opens
+the script's page full screen inside the phone.
+
+```lua
+-- client, from your own resource
+exports['XS-Phone']:AddCustomApp({
+    id = 'my-app',                     -- letters, numbers, - and _
+    name = 'My App',
+    ui = 'html/app/index.html',        -- a page in your resource, or a full https:// link
+    icon = 'html/app/icon.png',        -- optional, square
+    colour = '#2ea8ff',                -- optional, the icon background
+})
+exports['XS-Phone']:RemoveCustomApp('my-app')
+exports['XS-Phone']:SendCustomAppMessage('my-app', { anything = true }) -- arrives as a message event in your page
+```
+
+- Apps are removed by themselves when the resource that added them stops.
+  Add yours again when XS-Phone starts (`onResourceStart`).
+- A custom app can't replace one of the phone's own apps.
+- Your page talks to your own resource with the usual
+  `fetch('https://your-resource/callback')`.
+- From inside your page, `window.parent.postMessage('xs-phone:home', '*')` goes
+  back to the home screen and `'xs-phone:escape'` closes the phone.
+- Notifications use the same id:
+  `exports['XS-Phone']:Notify(source, { app = 'my-app', title = '...', body = '...' })`.
 
 ## If something's not working
 
