@@ -2,6 +2,12 @@
 
 All notable changes to **XS-Phone**.
 
+## [2.4.0] — 2026-11-10
+
+- The Home app works with XS-Housing: your places, locking and unlocking, and keys
+
+Replace everything except your config.lua. No SQL to run.
+
 ## [2.3.0] — 2026-11-01
 
 - Apps from other scripts are in the App Store now. Remove them from your home screen and download them again whenever you want

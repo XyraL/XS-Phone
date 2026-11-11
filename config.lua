@@ -235,7 +235,7 @@ Config.Phone = {
     -- ps-housing, qb-houses or bcs_housing. Lock, share keys and see who
     -- rang the doorbell, as far as each housing script allows.
     Home = {
-        housing = 'auto', -- or force one: 'qbx_properties', 'ps-housing', 'qb-houses', 'bcs_housing', 'none'
+        housing = 'auto', -- or force one: 'XS-Housing', 'qbx_properties', 'ps-housing', 'qb-houses', 'bcs_housing', 'none'
         maxKeys = 10,
     },
 

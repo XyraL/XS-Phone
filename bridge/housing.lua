@@ -1,6 +1,6 @@
 Housing = {}
 
-local SUPPORTED = { 'qbx_properties', 'ps-housing', 'qb-houses', 'bcs_housing' }
+local SUPPORTED = { 'XS-Housing', 'qbx_properties', 'ps-housing', 'qb-houses', 'bcs_housing' }
 local qbLocks = {}
 
 function Housing.Name()
@@ -59,6 +59,31 @@ local function home(id, label, owner, x, y, extra)
 end
 
 local adapters = {}
+
+adapters['XS-Housing'] = {
+    list = function(_, src)
+        local ok, homes = pcall(function() return exports['XS-Housing']:GetHomes(src) end)
+        local out = {}
+        if not ok or type(homes) ~= 'table' then return out end
+        for _, h in ipairs(homes) do
+            out[#out + 1] = home(h.id, h.label, h.owner == true, tonumber(h.x), tonumber(h.y),
+                { canLock = h.canLock == true, canKeys = h.canKeys == true, keys = h.keys or {}, locked = h.locked == true })
+        end
+        return out
+    end,
+    lockState = function(h)
+        return h.locked == true
+    end,
+    setLock = function(src, h, locked)
+        local ok, done = pcall(function() return exports['XS-Housing']:SetLocked(src, h.id, locked) end)
+        return ok and done == true
+    end,
+    setKeys = function(src, id, _, _, added, removed)
+        local ok, done, err = pcall(function() return exports['XS-Housing']:SetKeys(src, id, added, removed) end)
+        if not ok then return false, 'failed' end
+        return done, err
+    end,
+}
 
 adapters['qbx_properties'] = {
     list = function(cid)
