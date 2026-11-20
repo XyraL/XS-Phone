@@ -2,6 +2,12 @@
 
 All notable changes to **XS-Phone**.
 
+## [2.4.1] — 2026-11-20
+
+- Business bills now work if your bank starts later
+
+Replace everything except your config.lua. No SQL to run.
+
 ## [2.4.0] — 2026-11-10
 
 - The Home app works with XS-Housing: your places, locking and unlocking, and keys
